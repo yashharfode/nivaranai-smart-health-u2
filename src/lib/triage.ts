@@ -13,6 +13,19 @@ export interface TriageResult {
   source?: "ai" | "fallback";
 }
 
+export interface Assignment {
+  facilityId: string;
+  facilityName: string;
+  facilityType: "Hospital" | "Clinic";
+  departmentId: string;
+  departmentName: string;
+  doctorId: string;
+  doctorName: string;
+  doctorSpecialty: string;
+  room?: string;
+  mode: "manual" | "auto";
+}
+
 export interface PatientRecord extends TriageResult {
   id: string;
   patient_name: string;
@@ -22,6 +35,8 @@ export interface PatientRecord extends TriageResult {
   priority: Priority;
   timestamp: number;
   status?: "waiting" | "in_consult" | "done";
+  assignment?: Assignment;
+  suggested_department?: string;
 }
 
 export function getPriority(severity: number): Priority {
@@ -91,17 +106,20 @@ export function sortByPriority(patients: PatientRecord[]) {
   });
 }
 
-export async function analyzeTranscript(transcript: string): Promise<TriageResult> {
+export async function analyzeTranscript(
+  transcript: string,
+  availableDepartments?: string[],
+): Promise<TriageResult & { suggested_department?: string }> {
   const res = await fetch("/api/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ transcript }),
+    body: JSON.stringify({ transcript, availableDepartments }),
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Analyze failed (${res.status})`);
   }
-  return (await res.json()) as TriageResult;
+  return await res.json();
 }
 
 function seedPatients(): PatientRecord[] {
