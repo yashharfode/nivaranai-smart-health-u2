@@ -180,6 +180,12 @@ function PatientRow({
         <p className="mt-0.5 truncate text-xs text-muted-foreground">
           {patient.main_symptom} · {patient.duration}
         </p>
+        {patient.assignment && (
+          <p className="mt-1 truncate text-[11px] text-foreground">
+            → {patient.assignment.doctorName} · {patient.assignment.departmentName}
+            {patient.assignment.room ? ` · ${patient.assignment.room}` : ""}
+          </p>
+        )}
         <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground/70">
           {timeAgo(patient.timestamp)} {patient.source === "fallback" && "· demo"}
         </p>
@@ -232,6 +238,19 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
           </button>
         </div>
       </div>
+
+      {patient.assignment && (
+        <div className="mt-4 rounded-2xl border border-border bg-secondary/40 p-3 text-xs">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Assigned ({patient.assignment.mode})
+          </p>
+          <p className="mt-0.5 font-medium text-foreground">{patient.assignment.doctorName} · {patient.assignment.doctorSpecialty}</p>
+          <p className="text-muted-foreground">
+            {patient.assignment.facilityName} · {patient.assignment.departmentName}
+            {patient.assignment.room ? ` · ${patient.assignment.room}` : ""}
+          </p>
+        </div>
+      )}
 
       <div className="mt-4 rounded-2xl bg-secondary/50 p-3 text-xs text-muted-foreground">
         <span className="font-semibold text-foreground">Patient said:</span> "{patient.transcript}"
