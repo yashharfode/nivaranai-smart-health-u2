@@ -55,7 +55,17 @@ export interface VoiceSession {
  *   "denied"  - user blocked
  *   "unsupported" - no mediaDevices API (older browser / insecure context)
  */
-export async function ensureMicPermission(): Promise<"granted" | "denied" | "unsupported"> {
+/** True when the page is loaded inside an iframe (e.g. Lovable preview). */
+export function isInIframe(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true; // cross-origin access throws → we're framed
+  }
+}
+
+export async function ensureMicPermission(): Promise<"granted" | "denied" | "unsupported" | "iframe-blocked"> {
   if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
     return "unsupported";
   }
@@ -66,6 +76,12 @@ export async function ensureMicPermission(): Promise<"granted" | "denied" | "uns
     return "granted";
   } catch (err: any) {
     const name = err?.name ?? "";
+    // In a sandboxed iframe without allow="microphone", browsers throw
+    // NotAllowedError without ever showing a prompt. Detect that case so we
+    // can tell the user to open the app in a new tab.
+    if ((name === "NotAllowedError" || name === "SecurityError") && isInIframe()) {
+      return "iframe-blocked";
+    }
     if (name === "NotAllowedError" || name === "SecurityError") return "denied";
     if (name === "NotFoundError" || name === "OverconstrainedError") return "unsupported";
     return "denied";
@@ -92,6 +108,12 @@ export async function startVoice(opts: {
   // Step 1: explicitly request mic permission. This shows the browser prompt
   // reliably and lets us return a clear error message on denial.
   const perm = await ensureMicPermission();
+  if (perm === "iframe-blocked") {
+    opts.onError(
+      "Mic blocked inside preview iframe. Open this app in a new tab (↗ button at the top of the preview) to grant microphone access — or just type your symptoms below.",
+    );
+    return null;
+  }
   if (perm === "denied") {
     opts.onError(
       "Microphone access denied. Click the lock icon in the address bar → allow microphone, then try again.",
