@@ -26,6 +26,15 @@ export interface Assignment {
   mode: "manual" | "auto";
 }
 
+export type PatientStatus = "pending" | "accepted" | "in_consult" | "completed" | "rejected";
+
+export interface PatientHistoryEntry {
+  id: string;
+  timestamp: number;
+  main_symptom: string;
+  severity: number;
+}
+
 export interface PatientRecord extends TriageResult {
   id: string;
   patient_name: string;
@@ -34,9 +43,15 @@ export interface PatientRecord extends TriageResult {
   transcript: string;
   priority: Priority;
   timestamp: number;
-  status?: "waiting" | "in_consult" | "done";
+  status?: PatientStatus;
   assignment?: Assignment;
   suggested_department?: string;
+  /** Mock pre-existing condition flag (e.g. "Diabetes", "Hypertension"). */
+  pre_existing?: string;
+  /** Past visits for the same patient name (populated on creation). */
+  history?: PatientHistoryEntry[];
+  /** Whether the doctor has sent a prescription. */
+  prescription_sent?: boolean;
 }
 
 export function getPriority(severity: number): Priority {
@@ -44,6 +59,14 @@ export function getPriority(severity: number): Priority {
   if (severity >= 5) return "urgent";
   return "normal";
 }
+
+export const statusMeta: Record<PatientStatus, { label: string; chip: string }> = {
+  pending: { label: "Pending", chip: "bg-muted text-foreground border-border" },
+  accepted: { label: "Accepted", chip: "bg-primary/10 text-primary border-primary/20" },
+  in_consult: { label: "In Consultation", chip: "bg-warning/15 text-[oklch(0.45_0.12_60)] border-warning/30" },
+  completed: { label: "Completed", chip: "bg-success/15 text-success border-success/30" },
+  rejected: { label: "Rejected", chip: "bg-destructive/10 text-destructive border-destructive/20" },
+};
 
 export const priorityMeta: Record<Priority, { label: string; dot: string; chip: string; ring: string; rank: number }> = {
   critical: {
