@@ -16,9 +16,12 @@ export interface TriageResult {
 export interface PatientRecord extends TriageResult {
   id: string;
   patient_name: string;
+  patient_age?: number;
+  patient_gender?: string;
   transcript: string;
   priority: Priority;
   timestamp: number;
+  status?: "waiting" | "in_consult" | "done";
 }
 
 export function getPriority(severity: number): Priority {
@@ -51,12 +54,12 @@ export const priorityMeta: Record<Priority, { label: string; dot: string; chip: 
   },
 };
 
-const KEY = "nivaranai.patients.v1";
+export const PATIENTS_KEY = "nivaranai.patients.v1";
 
 export function loadPatients(): PatientRecord[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = window.localStorage.getItem(KEY);
+    const raw = window.localStorage.getItem(PATIENTS_KEY);
     if (!raw) return seedPatients();
     const parsed = JSON.parse(raw) as PatientRecord[];
     if (!Array.isArray(parsed) || parsed.length === 0) return seedPatients();
@@ -68,7 +71,37 @@ export function loadPatients(): PatientRecord[] {
 
 export function savePatients(patients: PatientRecord[]) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(KEY, JSON.stringify(patients));
+  window.localStorage.setItem(PATIENTS_KEY, JSON.stringify(patients));
+  // Notify same-tab subscribers (storage event only fires across tabs)
+  window.dispatchEvent(new CustomEvent("nivaranai:patients", { detail: patients }));
+}
+
+export function addPatient(rec: PatientRecord) {
+  const list = loadPatients();
+  const next = [rec, ...list];
+  savePatients(next);
+  return next;
+}
+
+export function sortByPriority(patients: PatientRecord[]) {
+  return [...patients].sort((a, b) => {
+    const r = priorityMeta[a.priority].rank - priorityMeta[b.priority].rank;
+    if (r !== 0) return r;
+    return b.timestamp - a.timestamp;
+  });
+}
+
+export async function analyzeTranscript(transcript: string): Promise<TriageResult> {
+  const res = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ transcript }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Analyze failed (${res.status})`);
+  }
+  return (await res.json()) as TriageResult;
 }
 
 function seedPatients(): PatientRecord[] {
@@ -77,11 +110,13 @@ function seedPatients(): PatientRecord[] {
     {
       id: "seed-1",
       patient_name: "Priya Nair",
+      patient_age: 28,
       transcript: "I have had a fever and sore throat for two days.",
       main_symptom: "Fever with sore throat",
       duration: "2 days",
       severity: 4,
       priority: "normal",
+      status: "waiting",
       timestamp: now - 1000 * 60 * 14,
       soap: {
         subjective: "Fever ~100°F with sore throat for 2 days. Mild difficulty swallowing, no body ache.",
@@ -93,11 +128,13 @@ function seedPatients(): PatientRecord[] {
     {
       id: "seed-2",
       patient_name: "Ramesh Kumar",
+      patient_age: 56,
       transcript: "Severe headache and my BP feels very high since morning.",
       main_symptom: "Severe headache with high BP",
       duration: "Since morning",
       severity: 7,
       priority: "urgent",
+      status: "waiting",
       timestamp: now - 1000 * 60 * 8,
       soap: {
         subjective: "Severe throbbing headache since morning. Known hypertensive.",
