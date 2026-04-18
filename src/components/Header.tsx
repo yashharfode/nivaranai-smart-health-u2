@@ -23,7 +23,7 @@ export function Header() {
 
   const goDashboard = () => {
     if (!user) {
-      navigate({ to: "/login" });
+      navigate({ to: "/demo" });
     } else if (user.role === "doctor") {
       navigate({ to: "/dashboard/doctor" });
     } else {

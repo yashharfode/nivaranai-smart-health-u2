@@ -1,5 +1,6 @@
 import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { useState } from "react";
+import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { I18nProvider } from "@/lib/i18n";
@@ -85,6 +86,7 @@ function RootComponent() {
       <AuthProvider>
         {!splashDone && <Splash onDone={() => setSplashDone(true)} />}
         <Outlet />
+        <Toaster position="top-center" richColors closeButton />
       </AuthProvider>
     </I18nProvider>
   );
