@@ -15,6 +15,7 @@ import { Route as SignupPatientRouteImport } from './routes/signup.patient'
 import { Route as SignupDoctorRouteImport } from './routes/signup.doctor'
 import { Route as DashboardPatientRouteImport } from './routes/dashboard.patient'
 import { Route as DashboardDoctorRouteImport } from './routes/dashboard.doctor'
+import { Route as ApiAnalyzeRouteImport } from './routes/api.analyze'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -46,10 +47,16 @@ const DashboardDoctorRoute = DashboardDoctorRouteImport.update({
   path: '/dashboard/doctor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAnalyzeRoute = ApiAnalyzeRouteImport.update({
+  id: '/api/analyze',
+  path: '/api/analyze',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/api/analyze': typeof ApiAnalyzeRoute
   '/dashboard/doctor': typeof DashboardDoctorRoute
   '/dashboard/patient': typeof DashboardPatientRoute
   '/signup/doctor': typeof SignupDoctorRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/api/analyze': typeof ApiAnalyzeRoute
   '/dashboard/doctor': typeof DashboardDoctorRoute
   '/dashboard/patient': typeof DashboardPatientRoute
   '/signup/doctor': typeof SignupDoctorRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/api/analyze': typeof ApiAnalyzeRoute
   '/dashboard/doctor': typeof DashboardDoctorRoute
   '/dashboard/patient': typeof DashboardPatientRoute
   '/signup/doctor': typeof SignupDoctorRoute
@@ -77,6 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/api/analyze'
     | '/dashboard/doctor'
     | '/dashboard/patient'
     | '/signup/doctor'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/api/analyze'
     | '/dashboard/doctor'
     | '/dashboard/patient'
     | '/signup/doctor'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/login'
+    | '/api/analyze'
     | '/dashboard/doctor'
     | '/dashboard/patient'
     | '/signup/doctor'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  ApiAnalyzeRoute: typeof ApiAnalyzeRoute
   DashboardDoctorRoute: typeof DashboardDoctorRoute
   DashboardPatientRoute: typeof DashboardPatientRoute
   SignupDoctorRoute: typeof SignupDoctorRoute
@@ -152,12 +165,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDoctorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/analyze': {
+      id: '/api/analyze'
+      path: '/api/analyze'
+      fullPath: '/api/analyze'
+      preLoaderRoute: typeof ApiAnalyzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  ApiAnalyzeRoute: ApiAnalyzeRoute,
   DashboardDoctorRoute: DashboardDoctorRoute,
   DashboardPatientRoute: DashboardPatientRoute,
   SignupDoctorRoute: SignupDoctorRoute,
@@ -166,3 +187,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
