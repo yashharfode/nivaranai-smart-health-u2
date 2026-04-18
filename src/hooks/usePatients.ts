@@ -24,9 +24,14 @@ export function usePatients(): PatientRecord[] {
 
     window.addEventListener("nivaranai:patients", onCustom);
     window.addEventListener("storage", onStorage);
+    
+    // Auto-refresh simulating real-time sockets
+    const interval = setInterval(refresh, 3000);
+
     return () => {
       window.removeEventListener("nivaranai:patients", onCustom);
       window.removeEventListener("storage", onStorage);
+      clearInterval(interval);
     };
   }, []);
 

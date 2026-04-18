@@ -19,6 +19,12 @@ import {
   ShieldAlert,
   Filter,
   Inbox,
+  Lock,
+  Pill,
+  Save,
+  Mic,
+  MicOff,
+  Loader2,
 } from "lucide-react";
 import { DashboardShell } from "@/components/DashboardShell";
 import { useAuth } from "@/lib/auth";
@@ -26,12 +32,15 @@ import {
   priorityMeta,
   statusMeta,
   updatePatient,
+  decryptVault,
   type PatientRecord,
   type PatientStatus,
   type Priority,
 } from "@/lib/triage";
 import { usePatients } from "@/hooks/usePatients";
 import { useFacilities } from "@/hooks/useFacilities";
+import { isVoiceSupported, startVoice, type VoiceSession } from "@/lib/voice";
+import { useEffect, useRef } from "react";
 
 export const Route = createFileRoute("/dashboard/doctor")({
   head: () => ({
@@ -300,7 +309,8 @@ function PatientRow({
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
           <p className="truncate font-medium text-foreground">
-            {patient.patient_name}
+            {decryptVault(patient.patient_name)}
+            <span className="ml-1.5 inline-flex items-center gap-0.5 rounded bg-success/15 px-1 py-0.5 text-[9px] font-semibold tracking-wider text-success"><Lock className="h-2.5 w-2.5" /> Protected</span>
             {patient.patient_age ? (
               <span className="text-xs text-muted-foreground"> · {patient.patient_age}</span>
             ) : null}
@@ -370,7 +380,8 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
             <p className="font-display text-xs uppercase tracking-[0.18em]">SOAP note</p>
           </div>
           <h3 className="mt-1 truncate font-display text-xl font-semibold tracking-tight">
-            {patient.patient_name}
+            {decryptVault(patient.patient_name)}
+            <span className="ml-2 inline-flex items-center gap-1 rounded bg-success/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-success"><Lock className="h-3 w-3" /> Data Protected</span>
             {patient.patient_age ? (
               <span className="text-base font-normal text-muted-foreground">
                 {" "}
@@ -473,20 +484,80 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
         </div>
       )}
 
-      <div className="mt-3 flex items-center justify-between">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          AI-drafted SOAP{" "}
-          {patient.source === "ai" && <Sparkles className="ml-1 inline h-3 w-3 text-primary" />}
-        </p>
+      <div className="mt-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            AI-drafted SOAP{" "}
+            {patient.source === "ai" && <Sparkles className="ml-1 inline h-3 w-3 text-primary" />}
+          </p>
+        </div>
+        
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/50">
+            <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10">S</span> Subjective
+            </h4>
+            <p className="mt-2 text-sm text-foreground">{patient.soap.subjective}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/50">
+            <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[oklch(0.55_0.15_60)]">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warning/10 text-[oklch(0.55_0.15_60)]">O</span> Objective
+            </h4>
+            <p className="mt-2 text-sm text-foreground">{patient.soap.objective}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/50">
+            <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-destructive">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-destructive/10 text-destructive">A</span> Assessment
+            </h4>
+            <p className="mt-2 text-sm text-foreground">{patient.soap.assessment}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:border-primary/50">
+            <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-success">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-success/10 text-success">P</span> Plan
+            </h4>
+            <p className="mt-2 text-sm text-foreground">{patient.soap.plan}</p>
+          </div>
+        </div>
       </div>
-      <textarea
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        className="mt-2 h-56 w-full resize-none rounded-2xl border border-input bg-background p-4 text-sm leading-relaxed text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-ring/30"
-      />
 
       {/* Action bar */}
-      <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+      <div className="mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-border pt-4">
+        {status === "completed" && (
+           <button
+             onClick={() => {
+                const w = window.open('', '_blank');
+                w?.document.write(`
+                  <html><head><title>Medical Report</title>
+                  <style>
+                    body { font-family: system-ui, sans-serif; padding: 40px; color: #111; line-height: 1.5; }
+                    .header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
+                    .section { margin-bottom: 20px; background: #f9fafb; padding: 15px; border-radius: 8px; }
+                    h4 { margin: 0 0 10px 0; color: #4f46e5; }
+                  </style>
+                  </head><body>
+                  <div class="header">
+                    <h2>NivaranAI Medical Report</h2>
+                    <p><strong>Patient Name:</strong> ${patient.patient_name} ${patient.patient_age ? '('+patient.patient_age+' yrs)' : ''}</p>
+                    <p><strong>Condition:</strong> ${patient.main_symptom}</p>
+                    <p><strong>Severity:</strong> ${patient.severity}/10</p>
+                    <p><strong>Assigned Doctor:</strong> ${patient.assignment?.doctorName ?? "Not assigned"}</p>
+                  </div>
+                  <h3>Clinical Notes (SOAP)</h3>
+                  <div class="section"><h4>Subjective</h4><p>${patient.soap.subjective}</p></div>
+                  <div class="section"><h4>Objective</h4><p>${patient.soap.objective}</p></div>
+                  <div class="section"><h4>Assessment</h4><p>${patient.soap.assessment}</p></div>
+                  <div class="section"><h4>Plan</h4><p>${patient.soap.plan}</p></div>
+                  <br/><br/><p style="color:gray; font-size:12px; text-align:center;">Generated by NivaranAI at ${new Date().toLocaleString()}</p>
+                  <script>window.print(); setTimeout(() => window.close(), 500);</script>
+                  </body></html>
+                `);
+                w?.document.close();
+             }}
+             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
+           >
+             <FileText className="h-3.5 w-3.5" /> Download Report (PDF)
+           </button>
+        )}
         {status === "pending" && (
           <>
             <button
@@ -514,32 +585,11 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
           </button>
         )}
         {status === "in_consult" && (
-          <>
-            <button
-              onClick={() => {
-                updatePatient(patient.id, { prescription_sent: true });
-                toast.success("Prescription sent to patient ✅", {
-                  description: "Delivered via WhatsApp & SMS",
-                });
-              }}
-              className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/15"
-            >
-              <Send className="h-3.5 w-3.5" /> Send prescription
-            </button>
-            <button
-              onClick={() => setStatus("completed", `Marked complete · ${patient.patient_name}`)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-success px-4 py-2 text-sm font-medium text-background transition-all hover:opacity-90"
-            >
-              <CheckCheck className="h-3.5 w-3.5" /> Complete
-            </button>
-          </>
+          <ConsultationTools 
+            patient={patient} 
+            onComplete={() => setStatus("completed", `Marked complete · ${decryptVault(patient.patient_name)}`)} 
+          />
         )}
-        <button
-          onClick={() => toast("Draft saved locally.")}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground hover:bg-secondary"
-        >
-          Save draft
-        </button>
       </div>
 
       {patient.prescription_sent && (
@@ -563,4 +613,144 @@ function timeAgo(ts: number) {
   const h = Math.floor(m / 60);
   if (h < 24) return `${h}h ago`;
   return new Date(ts).toLocaleDateString();
+}
+
+function ConsultationTools({ patient, onComplete }: { patient: PatientRecord; onComplete: () => void }) {
+  const [drug, setDrug] = useState("");
+  const [notes, setNotes] = useState("");
+  
+  // Voice Recording functionality
+  const [recordingTarget, setRecordingTarget] = useState<"notes" | "drug" | null>(null);
+  const [starting, setStarting] = useState(false);
+  const sessionRef = useRef<VoiceSession | null>(null);
+  const [supported, setSupported] = useState(true);
+
+  useEffect(() => {
+    setSupported(isVoiceSupported());
+    return () => sessionRef.current?.stop();
+  }, []);
+
+  const startRecording = async (target: "notes" | "drug") => {
+    setStarting(true);
+    setRecordingTarget(target);
+    try {
+      const s = await startVoice({
+        lang: "en-IN",
+        onInterim: (t) => {
+           // We can skip interim or handle it smoothly. Keeping it simple.
+        },
+        onFinal: (t) => {
+          if (target === "notes") setNotes((prev) => (prev ? `${prev.trim()} ${t.trim()}` : t.trim()));
+          if (target === "drug") setDrug((prev) => (prev ? `${prev.trim()} ${t.trim()}` : t.trim()));
+        },
+        onError: (msg) => {
+          toast.error(msg);
+          setRecordingTarget(null);
+        },
+        onEnd: () => {
+          setRecordingTarget(null);
+        },
+      });
+      if (s) {
+        sessionRef.current = s;
+      } else {
+        setRecordingTarget(null);
+      }
+    } finally {
+      setStarting(false);
+    }
+  };
+
+  const stopRecording = () => {
+    sessionRef.current?.stop();
+    sessionRef.current = null;
+    setRecordingTarget(null);
+  };
+  
+  const handlePrescribe = () => {
+    if (!drug) return;
+    // Mock Drug Interaction Engine
+    const conflict = patient.pre_existing?.toLowerCase().includes("hypertension") && drug.toLowerCase().includes("ibuprofen");
+    const allergy = drug.toLowerCase().includes("penicillin");
+    
+    if (conflict || allergy) {
+      toast.error(`⚠️ Warning: ${drug} may interact with patient's condition or allergies.`);
+      return;
+    }
+    
+    updatePatient(patient.id, { prescription_sent: true });
+    toast.success("Prescription sent to patient ✅", {
+      description: "Delivered securely via SMS & Vault",
+    });
+    setDrug("");
+  };
+
+  return (
+    <div className="mt-4 w-full rounded-2xl border border-border bg-secondary/30 p-4">
+      <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Consultation Summary</h4>
+      <div className="space-y-3">
+        <div className="relative">
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            disabled={recordingTarget === "notes" && starting}
+            placeholder={recordingTarget === "notes" ? "Listening..." : "Add clinical notes, update diagnosis..."}
+            className={`w-full resize-none rounded-xl border border-input bg-background p-3 pr-10 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/30 ${recordingTarget === "notes" ? 'ring-2 ring-primary/50' : ''}`}
+            rows={2}
+          />
+          {supported && (
+            <button
+              onClick={() => recordingTarget === "notes" ? stopRecording() : startRecording("notes")}
+              className={`absolute right-2 top-2 rounded-lg p-1.5 transition-all ${recordingTarget === "notes" ? 'bg-destructive text-destructive-foreground' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
+            >
+              {recordingTarget === "notes" && starting ? <Loader2 className="h-4 w-4 animate-spin" /> : 
+               recordingTarget === "notes" ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Pill className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={drug}
+              onChange={(e) => setDrug(e.target.value)}
+              disabled={recordingTarget === "drug" && starting}
+              placeholder={recordingTarget === "drug" ? "Listening..." : "e.g. Paracetamol 500mg (Try 'Ibuprofen')"}
+              className={`w-full rounded-xl border border-input bg-background py-2 pl-9 pr-10 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-ring/30 ${recordingTarget === "drug" ? 'ring-2 ring-primary/50' : ''}`}
+            />
+            {supported && (
+              <button
+                onClick={() => recordingTarget === "drug" ? stopRecording() : startRecording("drug")}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 transition-all ${recordingTarget === "drug" ? 'bg-destructive text-destructive-foreground' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
+              >
+                {recordingTarget === "drug" && starting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 
+                 recordingTarget === "drug" ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+              </button>
+            )}
+          </div>
+          <button
+            onClick={handlePrescribe}
+            disabled={!drug}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+          >
+            <Send className="h-4 w-4" /> Prescribe
+          </button>
+        </div>
+        <div className="flex justify-end gap-2 pt-2 border-t border-border/50">
+          <button
+            onClick={() => toast("Consultation notes saved securely.")}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-secondary"
+          >
+            <Save className="h-4 w-4" /> Add Notes
+          </button>
+          <button
+            onClick={onComplete}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-success px-4 py-2 text-sm font-medium text-background transition-all hover:opacity-90"
+          >
+            <CheckCheck className="h-4 w-4" /> Complete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

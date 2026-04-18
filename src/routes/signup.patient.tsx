@@ -14,7 +14,7 @@ export const Route = createFileRoute("/signup/patient")({
 function PatientSignup() {
   const { signUpPatient } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "", age: "", gender: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", age: "", gender: "", phone: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +29,7 @@ function PatientSignup() {
         password: form.password,
         age: form.age ? Number(form.age) : undefined,
         gender: form.gender || undefined,
+        phone: form.phone || undefined,
       });
       navigate({ to: "/dashboard/patient" });
     } catch {
@@ -75,6 +76,13 @@ function PatientSignup() {
               type="password"
               value={form.password}
               onChange={(v) => setForm({ ...form, password: v })}
+              required
+            />
+            <Field
+              label="Mobile Number"
+              type="tel"
+              value={form.phone}
+              onChange={(v) => setForm({ ...form, phone: v })}
               required
             />
             <div className="grid grid-cols-2 gap-3">

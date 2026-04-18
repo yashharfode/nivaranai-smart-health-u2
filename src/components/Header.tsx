@@ -34,10 +34,18 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 glass-strong">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Link to="/" className="flex items-center gap-2.5">
-          <Logo className="h-8 w-8" />
-          <span className="font-display text-lg font-semibold tracking-tight">NivaranAI</span>
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link to="/" className="flex items-center gap-2.5">
+            <Logo className="h-8 w-8" />
+            <span className="font-display text-lg font-semibold tracking-tight">NivaranAI</span>
+          </Link>
+          <Link
+            to="/"
+            className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:block"
+          >
+            Home
+          </Link>
+        </div>
 
         {onLandingPage && (
           <nav className="hidden items-center gap-8 md:flex">
@@ -94,6 +102,13 @@ export function Header() {
       {open && (
         <div className="border-t border-border bg-background/95 backdrop-blur md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1 px-5 py-4">
+            <Link
+              to="/"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-secondary"
+              onClick={() => setOpen(false)}
+            >
+              Home
+            </Link>
             {onLandingPage &&
               navLinks.map((l) => (
                 <a

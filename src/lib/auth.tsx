@@ -28,6 +28,7 @@ export interface PatientUser extends BaseUser {
   role: "patient";
   age?: number;
   gender?: string;
+  phone?: string;
 }
 
 export type AppUser = DoctorUser | PatientUser;
@@ -43,6 +44,7 @@ interface AuthContextValue {
     password: string;
     age?: number;
     gender?: string;
+    phone?: string;
   }) => Promise<PatientUser>;
   signUpDoctor: (data: {
     name: string;
@@ -104,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       role: "patient",
       age: data.age,
       gender: data.gender,
+      phone: data.phone,
       createdAt: new Date().toISOString(),
     };
     persist(u);
