@@ -54,6 +54,12 @@ export function Header() {
         )}
 
         <div className="hidden items-center gap-2 md:flex">
+          <Link
+            to="/signup/hospital"
+            className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            For hospitals
+          </Link>
           <button
             onClick={() => setLang(lang === "en" ? "hi" : "en")}
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"

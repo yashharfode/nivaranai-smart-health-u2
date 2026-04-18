@@ -31,6 +31,7 @@ export function Footer() {
             <li><Link to="/signup/patient" className="hover:text-foreground">Patient signup</Link></li>
             <li><Link to="/signup/doctor" className="hover:text-foreground">Doctor signup</Link></li>
             <li><Link to="/signup/hospital" className="hover:text-foreground">Register hospital / clinic</Link></li>
+            <li><Link to="/admin-secret" className="text-xs text-muted-foreground/60 hover:text-foreground">Admin</Link></li>
           </ul>
         </div>
       </div>
