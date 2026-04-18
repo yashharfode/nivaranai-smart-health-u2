@@ -53,12 +53,18 @@ export function Header() {
           </nav>
         )}
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
           <Link
             to="/signup/hospital"
             className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             For hospitals
+          </Link>
+          <Link
+            to="/contact"
+            className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Contact
           </Link>
           <button
             onClick={() => setLang(lang === "en" ? "hi" : "en")}

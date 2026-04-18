@@ -709,6 +709,15 @@ function QueueCard({
   position: number | null;
   totalWaiting: number;
 }) {
+  const status = (latest?.status ?? "pending") as NonNullable<PatientRecord["status"]>;
+  const steps: Array<{ key: NonNullable<PatientRecord["status"]>; label: string }> = [
+    { key: "pending", label: "Submitted" },
+    { key: "accepted", label: "Doctor accepted" },
+    { key: "in_consult", label: "In consultation" },
+    { key: "completed", label: "Completed" },
+  ];
+  const activeIdx = status === "rejected" ? -1 : steps.findIndex((s) => s.key === status);
+
   return (
     <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
       <div className="flex items-center gap-2 text-primary">
@@ -737,6 +746,47 @@ function QueueCard({
                   {latest.assignment.facilityName} · {latest.assignment.departmentName}
                   {latest.assignment.room ? ` · ${latest.assignment.room}` : ""}
                 </p>
+              </div>
+            )}
+          </div>
+
+          {/* Live status timeline */}
+          <div className="mt-5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Live status</p>
+            {status === "rejected" ? (
+              <div className="mt-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+                ❌ The doctor has declined this consultation. Please try another doctor.
+              </div>
+            ) : (
+              <ol className="mt-3 space-y-2.5">
+                {steps.map((s, i) => {
+                  const done = i < activeIdx;
+                  const active = i === activeIdx;
+                  return (
+                    <li key={s.key} className="flex items-center gap-3">
+                      <span
+                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-all ${
+                          done
+                            ? "border-success bg-success text-background"
+                            : active
+                              ? "border-primary bg-primary text-primary-foreground animate-pulse"
+                              : "border-border bg-background text-muted-foreground"
+                        }`}
+                      >
+                        {done ? "✓" : i + 1}
+                      </span>
+                      <span className={`text-xs ${active ? "font-semibold text-foreground" : done ? "text-foreground" : "text-muted-foreground"}`}>
+                        {s.label}
+                        {active && <span className="ml-1.5 text-primary">· now</span>}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+            {latest.prescription_sent && (
+              <div className="mt-3 rounded-xl border border-success/30 bg-success/10 p-3 text-xs text-success">
+                💊 Prescription received from {latest.assignment?.doctorName ?? "your doctor"}.
               </div>
             )}
           </div>
