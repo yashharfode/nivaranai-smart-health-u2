@@ -63,12 +63,18 @@ export function getPriority(severity: number): Priority {
 export const statusMeta: Record<PatientStatus, { label: string; chip: string }> = {
   pending: { label: "Pending", chip: "bg-muted text-foreground border-border" },
   accepted: { label: "Accepted", chip: "bg-primary/10 text-primary border-primary/20" },
-  in_consult: { label: "In Consultation", chip: "bg-warning/15 text-[oklch(0.45_0.12_60)] border-warning/30" },
+  in_consult: {
+    label: "In Consultation",
+    chip: "bg-warning/15 text-[oklch(0.45_0.12_60)] border-warning/30",
+  },
   completed: { label: "Completed", chip: "bg-success/15 text-success border-success/30" },
   rejected: { label: "Rejected", chip: "bg-destructive/10 text-destructive border-destructive/20" },
 };
 
-export const priorityMeta: Record<Priority, { label: string; dot: string; chip: string; ring: string; rank: number }> = {
+export const priorityMeta: Record<
+  Priority,
+  { label: string; dot: string; chip: string; ring: string; rank: number }
+> = {
   critical: {
     label: "CRITICAL",
     dot: "bg-destructive",
@@ -177,7 +183,8 @@ function seedPatients(): PatientRecord[] {
       status: "pending",
       timestamp: now - 1000 * 60 * 14,
       soap: {
-        subjective: "Fever ~100°F with sore throat for 2 days. Mild difficulty swallowing, no body ache.",
+        subjective:
+          "Fever ~100°F with sore throat for 2 days. Mild difficulty swallowing, no body ache.",
         objective: "Awaiting examination.",
         assessment: "Likely viral pharyngitis.",
         plan: "Paracetamol PRN, saline gargles, hydration. Review in 3 days.",

@@ -1,9 +1,29 @@
 const steps = [
-  { n: "01", title: "Patient speaks symptoms", body: "Natural voice input — English or Hindi, no forms to fill." },
-  { n: "02", title: "AI asks smart questions", body: "Adaptive follow-ups uncover the full clinical picture." },
-  { n: "03", title: "SOAP notes generated", body: "Subjective, Objective, Assessment, Plan — drafted automatically." },
-  { n: "04", title: "Doctor reviews", body: "Edit in place, add nuance, approve in under a minute." },
-  { n: "05", title: "Voice prescription sent", body: "Delivered to the patient on WhatsApp in plain language." },
+  {
+    n: "01",
+    title: "Patient speaks symptoms",
+    body: "Natural voice input — English or Hindi, no forms to fill.",
+  },
+  {
+    n: "02",
+    title: "AI asks smart questions",
+    body: "Adaptive follow-ups uncover the full clinical picture.",
+  },
+  {
+    n: "03",
+    title: "SOAP notes generated",
+    body: "Subjective, Objective, Assessment, Plan — drafted automatically.",
+  },
+  {
+    n: "04",
+    title: "Doctor reviews",
+    body: "Edit in place, add nuance, approve in under a minute.",
+  },
+  {
+    n: "05",
+    title: "Voice prescription sent",
+    body: "Delivered to the patient on WhatsApp in plain language.",
+  },
 ];
 
 export function HowItWorks() {
@@ -11,7 +31,9 @@ export function HowItWorks() {
     <section id="how" className="border-t border-border/60 bg-secondary/30 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="reveal max-w-2xl">
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">How it works</p>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            How it works
+          </p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             Five calm steps, start to finish.
           </h2>

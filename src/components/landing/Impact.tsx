@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
-function Counter({ to, suffix = "", duration = 1600 }: { to: number; suffix?: string; duration?: number }) {
+function Counter({
+  to,
+  suffix = "",
+  duration = 1600,
+}: {
+  to: number;
+  suffix?: string;
+  duration?: number;
+}) {
   const [val, setVal] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const started = useRef(false);
@@ -40,7 +48,10 @@ function Counter({ to, suffix = "", duration = 1600 }: { to: number; suffix?: st
 
 export function Impact() {
   return (
-    <section id="impact" className="border-t border-border/60 bg-gradient-to-b from-background to-secondary/40 py-20 sm:py-28">
+    <section
+      id="impact"
+      className="border-t border-border/60 bg-gradient-to-b from-background to-secondary/40 py-20 sm:py-28"
+    >
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="reveal max-w-2xl">
           <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Impact</p>

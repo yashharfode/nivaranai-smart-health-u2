@@ -65,7 +65,9 @@ export function isInIframe(): boolean {
   }
 }
 
-export async function ensureMicPermission(): Promise<"granted" | "denied" | "unsupported" | "iframe-blocked"> {
+export async function ensureMicPermission(): Promise<
+  "granted" | "denied" | "unsupported" | "iframe-blocked"
+> {
   if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
     return "unsupported";
   }

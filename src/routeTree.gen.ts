@@ -17,7 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignupPatientRouteImport } from './routes/signup.patient'
 import { Route as SignupHospitalRouteImport } from './routes/signup.hospital'
 import { Route as SignupDoctorRouteImport } from './routes/signup.doctor'
-import { Route as LoginHospitalRouteImport } from './routes/login.hospital'
+import { Route as LoginHospitalRouteImport } from './routes/login_.hospital'
 import { Route as DashboardPatientRouteImport } from './routes/dashboard.patient'
 import { Route as DashboardHospitalRouteImport } from './routes/dashboard.hospital'
 import { Route as DashboardDoctorRouteImport } from './routes/dashboard.doctor'
@@ -64,9 +64,9 @@ const SignupDoctorRoute = SignupDoctorRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginHospitalRoute = LoginHospitalRouteImport.update({
-  id: '/hospital',
-  path: '/hospital',
-  getParentRoute: () => LoginRoute,
+  id: '/login_/hospital',
+  path: '/login/hospital',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardPatientRoute = DashboardPatientRouteImport.update({
   id: '/dashboard/patient',
@@ -94,7 +94,7 @@ export interface FileRoutesByFullPath {
   '/admin-secret': typeof AdminSecretRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
-  '/login': typeof LoginRouteWithChildren
+  '/login': typeof LoginRoute
   '/api/analyze': typeof ApiAnalyzeRoute
   '/dashboard/doctor': typeof DashboardDoctorRoute
   '/dashboard/hospital': typeof DashboardHospitalRoute
@@ -109,7 +109,7 @@ export interface FileRoutesByTo {
   '/admin-secret': typeof AdminSecretRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
-  '/login': typeof LoginRouteWithChildren
+  '/login': typeof LoginRoute
   '/api/analyze': typeof ApiAnalyzeRoute
   '/dashboard/doctor': typeof DashboardDoctorRoute
   '/dashboard/hospital': typeof DashboardHospitalRoute
@@ -125,12 +125,12 @@ export interface FileRoutesById {
   '/admin-secret': typeof AdminSecretRoute
   '/contact': typeof ContactRoute
   '/demo': typeof DemoRoute
-  '/login': typeof LoginRouteWithChildren
+  '/login': typeof LoginRoute
   '/api/analyze': typeof ApiAnalyzeRoute
   '/dashboard/doctor': typeof DashboardDoctorRoute
   '/dashboard/hospital': typeof DashboardHospitalRoute
   '/dashboard/patient': typeof DashboardPatientRoute
-  '/login/hospital': typeof LoginHospitalRoute
+  '/login_/hospital': typeof LoginHospitalRoute
   '/signup/doctor': typeof SignupDoctorRoute
   '/signup/hospital': typeof SignupHospitalRoute
   '/signup/patient': typeof SignupPatientRoute
@@ -177,7 +177,7 @@ export interface FileRouteTypes {
     | '/dashboard/doctor'
     | '/dashboard/hospital'
     | '/dashboard/patient'
-    | '/login/hospital'
+    | '/login_/hospital'
     | '/signup/doctor'
     | '/signup/hospital'
     | '/signup/patient'
@@ -188,11 +188,12 @@ export interface RootRouteChildren {
   AdminSecretRoute: typeof AdminSecretRoute
   ContactRoute: typeof ContactRoute
   DemoRoute: typeof DemoRoute
-  LoginRoute: typeof LoginRouteWithChildren
+  LoginRoute: typeof LoginRoute
   ApiAnalyzeRoute: typeof ApiAnalyzeRoute
   DashboardDoctorRoute: typeof DashboardDoctorRoute
   DashboardHospitalRoute: typeof DashboardHospitalRoute
   DashboardPatientRoute: typeof DashboardPatientRoute
+  LoginHospitalRoute: typeof LoginHospitalRoute
   SignupDoctorRoute: typeof SignupDoctorRoute
   SignupHospitalRoute: typeof SignupHospitalRoute
   SignupPatientRoute: typeof SignupPatientRoute
@@ -256,12 +257,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupDoctorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login/hospital': {
-      id: '/login/hospital'
-      path: '/hospital'
+    '/login_/hospital': {
+      id: '/login_/hospital'
+      path: '/login/hospital'
       fullPath: '/login/hospital'
       preLoaderRoute: typeof LoginHospitalRouteImport
-      parentRoute: typeof LoginRoute
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/patient': {
       id: '/dashboard/patient'
@@ -294,26 +295,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface LoginRouteChildren {
-  LoginHospitalRoute: typeof LoginHospitalRoute
-}
-
-const LoginRouteChildren: LoginRouteChildren = {
-  LoginHospitalRoute: LoginHospitalRoute,
-}
-
-const LoginRouteWithChildren = LoginRoute._addFileChildren(LoginRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminSecretRoute: AdminSecretRoute,
   ContactRoute: ContactRoute,
   DemoRoute: DemoRoute,
-  LoginRoute: LoginRouteWithChildren,
+  LoginRoute: LoginRoute,
   ApiAnalyzeRoute: ApiAnalyzeRoute,
   DashboardDoctorRoute: DashboardDoctorRoute,
   DashboardHospitalRoute: DashboardHospitalRoute,
   DashboardPatientRoute: DashboardPatientRoute,
+  LoginHospitalRoute: LoginHospitalRoute,
   SignupDoctorRoute: SignupDoctorRoute,
   SignupHospitalRoute: SignupHospitalRoute,
   SignupPatientRoute: SignupPatientRoute,
@@ -321,3 +313,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

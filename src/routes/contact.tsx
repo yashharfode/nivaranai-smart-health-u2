@@ -7,9 +7,15 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact us — NivaranAI" },
-      { name: "description", content: "Get in touch with the NivaranAI team for support, partnerships, and onboarding." },
+      {
+        name: "description",
+        content: "Get in touch with the NivaranAI team for support, partnerships, and onboarding.",
+      },
       { property: "og:title", content: "Contact NivaranAI" },
-      { property: "og:description", content: "Email yashharfode123@gmail.com or call +91 8819244133." },
+      {
+        property: "og:description",
+        content: "Email yashharfode123@gmail.com or call +91 8819244133.",
+      },
     ],
   }),
   component: ContactPage,
@@ -25,7 +31,8 @@ function ContactPage() {
           We'd love to hear from you
         </h1>
         <p className="mt-3 max-w-2xl text-base text-muted-foreground">
-          For hospital onboarding, technical support, or partnership enquiries — reach out and we'll get back within one business day.
+          For hospital onboarding, technical support, or partnership enquiries — reach out and we'll
+          get back within one business day.
         </p>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2">

@@ -44,17 +44,46 @@ function PatientSignup() {
       <main className="mx-auto flex max-w-7xl items-center justify-center px-5 py-16 sm:px-8 sm:py-24">
         <div className="w-full max-w-md">
           <div className="text-center">
-            <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Patient signup</p>
-            <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Create your account</h1>
+            <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+              Patient signup
+            </p>
+            <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">
+              Create your account
+            </h1>
             <p className="mt-2 text-sm text-muted-foreground">Start consulting in your language.</p>
           </div>
 
-          <form onSubmit={submit} className="mt-8 space-y-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
-            <Field label="Full name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} required />
-            <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} required />
-            <Field label="Password" type="password" value={form.password} onChange={(v) => setForm({ ...form, password: v })} required />
+          <form
+            onSubmit={submit}
+            className="mt-8 space-y-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8"
+          >
+            <Field
+              label="Full name"
+              value={form.name}
+              onChange={(v) => setForm({ ...form, name: v })}
+              required
+            />
+            <Field
+              label="Email"
+              type="email"
+              value={form.email}
+              onChange={(v) => setForm({ ...form, email: v })}
+              required
+            />
+            <Field
+              label="Password"
+              type="password"
+              value={form.password}
+              onChange={(v) => setForm({ ...form, password: v })}
+              required
+            />
             <div className="grid grid-cols-2 gap-3">
-              <Field label="Age" type="number" value={form.age} onChange={(v) => setForm({ ...form, age: v })} />
+              <Field
+                label="Age"
+                type="number"
+                value={form.age}
+                onChange={(v) => setForm({ ...form, age: v })}
+              />
               <SelectField
                 label="Gender"
                 value={form.gender}
@@ -68,7 +97,13 @@ function PatientSignup() {
               disabled={submitting}
               className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-all hover:bg-mineral disabled:opacity-60"
             >
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Create account <ArrowRight className="h-4 w-4" /></>}
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  Create account <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </button>
             <p className="text-center text-xs text-muted-foreground">
               Already registered?{" "}

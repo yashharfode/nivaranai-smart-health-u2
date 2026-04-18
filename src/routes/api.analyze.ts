@@ -19,9 +19,11 @@ const fallback = (transcript: string) => {
       duration: "A few hours",
       severity: 9,
       soap: {
-        subjective: "Patient reports chest tightness and breathlessness onset earlier today. No prior cardiac history mentioned.",
+        subjective:
+          "Patient reports chest tightness and breathlessness onset earlier today. No prior cardiac history mentioned.",
         objective: "Awaiting vitals. Observe for diaphoresis, pallor, distress.",
-        assessment: "Rule out acute coronary syndrome. Consider pulmonary embolism, panic attack as differentials.",
+        assessment:
+          "Rule out acute coronary syndrome. Consider pulmonary embolism, panic attack as differentials.",
         plan: "Urgent triage. ECG, SpO2, BP, troponin. Aspirin 300mg if no contraindication. Escalate to ER physician.",
       },
     };
@@ -32,7 +34,8 @@ const fallback = (transcript: string) => {
       duration: "2 days",
       severity: 4,
       soap: {
-        subjective: "Patient reports fever ~100°F with sore throat for 2 days. Mild difficulty swallowing, no body ache.",
+        subjective:
+          "Patient reports fever ~100°F with sore throat for 2 days. Mild difficulty swallowing, no body ache.",
         objective: "Awaiting examination. Check throat, lymph nodes, temperature.",
         assessment: "Likely viral pharyngitis. Rule out streptococcal infection.",
         plan: "Symptomatic care: paracetamol 500mg PRN, warm saline gargles, hydration. Review in 3 days if not improved.",
@@ -109,7 +112,8 @@ export const Route = createFileRoute("/api/analyze")({
                   type: "function",
                   function: {
                     name: "record_triage",
-                    description: "Record extracted symptom data, SOAP note, and best-fit department.",
+                    description:
+                      "Record extracted symptom data, SOAP note, and best-fit department.",
                     parameters: {
                       type: "object",
                       properties: {
@@ -133,7 +137,13 @@ export const Route = createFileRoute("/api/analyze")({
                           additionalProperties: false,
                         },
                       },
-                      required: ["main_symptom", "duration", "severity", "soap", "suggested_department"],
+                      required: [
+                        "main_symptom",
+                        "duration",
+                        "severity",
+                        "soap",
+                        "suggested_department",
+                      ],
                       additionalProperties: false,
                     },
                   },
@@ -147,7 +157,10 @@ export const Route = createFileRoute("/api/analyze")({
             return Response.json({ error: "Rate limited. Please wait a moment." }, { status: 429 });
           }
           if (resp.status === 402) {
-            return Response.json({ error: "AI credits exhausted. Add credits in Lovable workspace." }, { status: 402 });
+            return Response.json(
+              { error: "AI credits exhausted. Add credits in Lovable workspace." },
+              { status: 402 },
+            );
           }
           if (!resp.ok) {
             console.error("AI gateway error", resp.status, await resp.text());
@@ -176,7 +189,8 @@ export const Route = createFileRoute("/api/analyze")({
             const match = availableDepartments.find(
               (d) => d.toLowerCase() === String(parsed.suggested_department).toLowerCase(),
             );
-            parsed.suggested_department = match ?? pickFallbackDept(transcript, availableDepartments);
+            parsed.suggested_department =
+              match ?? pickFallbackDept(transcript, availableDepartments);
           }
           return Response.json({ ...parsed, source: "ai" });
         } catch (e) {

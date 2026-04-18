@@ -57,7 +57,11 @@ function DoctorSignup() {
         email: form.email,
         password: form.password,
         specialty: form.specialty,
-        hospital: { name: form.hospitalName, type: form.hospitalType, address: form.hospitalAddress },
+        hospital: {
+          name: form.hospitalName,
+          type: form.hospitalType,
+          address: form.hospitalAddress,
+        },
         documents: { degree: form.degreeFile, license: form.licenseFile },
       });
       navigate({ to: "/dashboard/doctor" });
@@ -73,9 +77,15 @@ function DoctorSignup() {
       <Header />
       <main className="mx-auto max-w-3xl px-5 py-12 sm:px-8 sm:py-20">
         <div className="text-center">
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Doctor signup</p>
-          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Join NivaranAI</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Verified clinicians only. Approval typically within 48 hours.</p>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            Doctor signup
+          </p>
+          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">
+            Join NivaranAI
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Verified clinicians only. Approval typically within 48 hours.
+          </p>
         </div>
 
         <Stepper current={step} />
@@ -84,9 +94,24 @@ function DoctorSignup() {
           {step === 0 && (
             <div className="space-y-4">
               <Field label="Full name" value={form.name} onChange={(v) => update("name", v)} />
-              <Field label="Email" type="email" value={form.email} onChange={(v) => update("email", v)} />
-              <Field label="Password" type="password" value={form.password} onChange={(v) => update("password", v)} />
-              <Field label="Specialty" placeholder="e.g. General Medicine" value={form.specialty} onChange={(v) => update("specialty", v)} />
+              <Field
+                label="Email"
+                type="email"
+                value={form.email}
+                onChange={(v) => update("email", v)}
+              />
+              <Field
+                label="Password"
+                type="password"
+                value={form.password}
+                onChange={(v) => update("password", v)}
+              />
+              <Field
+                label="Specialty"
+                placeholder="e.g. General Medicine"
+                value={form.specialty}
+                onChange={(v) => update("specialty", v)}
+              />
             </div>
           )}
 
@@ -103,16 +128,23 @@ function DoctorSignup() {
                 onFile={(name) => update("licenseFile", name)}
               />
               <p className="text-xs text-muted-foreground">
-                Files are not uploaded yet — this is a UI preview. Once Firebase is connected, uploads will go to secure storage.
+                Files are not uploaded yet — this is a UI preview. Once Firebase is connected,
+                uploads will go to secure storage.
               </p>
             </div>
           )}
 
           {step === 2 && (
             <div className="space-y-4">
-              <Field label="Hospital name" value={form.hospitalName} onChange={(v) => update("hospitalName", v)} />
+              <Field
+                label="Hospital name"
+                value={form.hospitalName}
+                onChange={(v) => update("hospitalName", v)}
+              />
               <div>
-                <label className="block text-xs font-medium text-muted-foreground">Hospital type</label>
+                <label className="block text-xs font-medium text-muted-foreground">
+                  Hospital type
+                </label>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   {(["Government", "Private"] as const).map((t) => (
                     <button
@@ -130,7 +162,11 @@ function DoctorSignup() {
                   ))}
                 </div>
               </div>
-              <Field label="Address" value={form.hospitalAddress} onChange={(v) => update("hospitalAddress", v)} />
+              <Field
+                label="Address"
+                value={form.hospitalAddress}
+                onChange={(v) => update("hospitalAddress", v)}
+              />
             </div>
           )}
 
@@ -144,8 +180,9 @@ function DoctorSignup() {
               <ReviewRow label="Hospital" value={`${form.hospitalName} (${form.hospitalType})`} />
               <ReviewRow label="Address" value={form.hospitalAddress} />
               <div className="mt-4 rounded-2xl bg-secondary px-4 py-3 text-xs text-muted-foreground">
-                After submission your status will be <span className="font-semibold text-foreground">Pending</span>.
-                You'll get full access once approved.
+                After submission your status will be{" "}
+                <span className="font-semibold text-foreground">Pending</span>. You'll get full
+                access once approved.
               </div>
             </div>
           )}
@@ -173,7 +210,13 @@ function DoctorSignup() {
                 disabled={submitting}
                 className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-colors hover:bg-mineral disabled:opacity-60"
               >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Submit application <Check className="h-4 w-4" /></>}
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    Submit application <Check className="h-4 w-4" />
+                  </>
+                )}
               </button>
             )}
           </div>
@@ -209,7 +252,9 @@ function Stepper({ current }: { current: number }) {
             >
               {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
             </div>
-            <span className={`hidden text-xs sm:block ${active ? "text-foreground" : "text-muted-foreground"}`}>
+            <span
+              className={`hidden text-xs sm:block ${active ? "text-foreground" : "text-muted-foreground"}`}
+            >
               {label}
             </span>
             {i < STEPS.length - 1 && <div className="h-px w-6 bg-border sm:w-10" />}
@@ -247,7 +292,15 @@ function Field({
   );
 }
 
-function FileField({ label, file, onFile }: { label: string; file: string; onFile: (n: string) => void }) {
+function FileField({
+  label,
+  file,
+  onFile,
+}: {
+  label: string;
+  file: string;
+  onFile: (n: string) => void;
+}) {
   return (
     <div>
       <label className="block text-xs font-medium text-muted-foreground">{label}</label>

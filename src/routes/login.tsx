@@ -33,7 +33,9 @@ function LoginPage() {
     }
     // Doctor email gate: only allow login if their email was registered by a hospital
     if (role === "doctor" && !isDoctorEmailRegistered(email)) {
-      setError("This doctor email is not registered with any hospital yet. Ask your hospital admin to add you.");
+      setError(
+        "This doctor email is not registered with any hospital yet. Ask your hospital admin to add you.",
+      );
       return;
     }
     setSubmitting(true);
@@ -53,8 +55,12 @@ function LoginPage() {
       <main className="mx-auto flex max-w-7xl items-center justify-center px-5 py-16 sm:px-8 sm:py-24">
         <div className="w-full max-w-md">
           <div className="text-center">
-            <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Welcome back</p>
-            <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">Login to NivaranAI</h1>
+            <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+              Welcome back
+            </p>
+            <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight">
+              Login to NivaranAI
+            </h1>
             <p className="mt-2 text-sm text-muted-foreground">Choose your role to continue.</p>
           </div>
 
@@ -73,7 +79,10 @@ function LoginPage() {
             />
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+          <form
+            onSubmit={handleSubmit}
+            className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8"
+          >
             <label className="block text-xs font-medium text-muted-foreground">Email</label>
             <input
               type="email"
@@ -98,7 +107,13 @@ function LoginPage() {
               disabled={submitting}
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-all hover:bg-mineral disabled:opacity-60"
             >
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Continue <ArrowRight className="h-4 w-4" /></>}
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  Continue <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </button>
 
             <p className="mt-5 text-center text-xs text-muted-foreground">
