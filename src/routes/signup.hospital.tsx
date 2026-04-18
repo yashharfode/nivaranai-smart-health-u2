@@ -1,6 +1,17 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Loader2, Plus, X, Building2, Stethoscope, Upload, ArrowRight, Mail, CheckCircle2, Copy } from "lucide-react";
+import {
+  Loader2,
+  Plus,
+  X,
+  Building2,
+  Stethoscope,
+  Upload,
+  ArrowRight,
+  Mail,
+  CheckCircle2,
+  Copy,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { addFacility, type FacilityType } from "@/lib/hospitals";
@@ -101,7 +112,9 @@ function HospitalSignup() {
             </p>
 
             <div className="mt-6 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-5 text-center">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">Application ID</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                Application ID
+              </p>
               <p className="font-display mt-1 text-2xl font-bold tracking-wide text-primary">
                 {confirmation.appId}
               </p>
@@ -115,7 +128,8 @@ function HospitalSignup() {
                 <Copy className="h-3 w-3" /> Copy ID
               </button>
               <p className="mt-3 text-xs text-muted-foreground">
-                Save this ID to track your approval status. Login credentials will be issued after approval.
+                Save this ID to track your approval status. Login credentials will be issued after
+                approval.
               </p>
             </div>
 
@@ -150,10 +164,14 @@ function HospitalSignup() {
           Register your facility
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Hospitals and clinics are reviewed by an administrator before patients can book consultations.
+          Hospitals and clinics are reviewed by an administrator before patients can book
+          consultations.
         </p>
 
-        <form onSubmit={submit} className="mt-8 space-y-6 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+        <form
+          onSubmit={submit}
+          className="mt-8 space-y-6 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8"
+        >
           <div>
             <label className="text-xs font-medium text-muted-foreground">Facility type</label>
             <div className="mt-2 grid grid-cols-2 gap-2">
@@ -177,7 +195,9 @@ function HospitalSignup() {
                     <Icon className="h-4 w-4" />
                     <div>
                       <div className="font-medium">{t}</div>
-                      <div className={`text-xs ${active ? "text-background/70" : "text-muted-foreground"}`}>
+                      <div
+                        className={`text-xs ${active ? "text-background/70" : "text-muted-foreground"}`}
+                      >
                         {t === "Hospital" ? "Multiple departments" : "Single doctor"}
                       </div>
                     </div>
@@ -187,8 +207,18 @@ function HospitalSignup() {
             </div>
           </div>
 
-          <Field label="Facility name" value={name} onChange={setName} placeholder="Apollo City Hospital" />
-          <Field label="Location" value={location} onChange={setLocation} placeholder="MG Road, Bengaluru" />
+          <Field
+            label="Facility name"
+            value={name}
+            onChange={setName}
+            placeholder="Apollo City Hospital"
+          />
+          <Field
+            label="Location"
+            value={location}
+            onChange={setLocation}
+            placeholder="MG Road, Bengaluru"
+          />
           <Field
             label="Email (required)"
             value={email}
@@ -197,13 +227,22 @@ function HospitalSignup() {
             type="email"
             icon={<Mail className="h-3.5 w-3.5" />}
           />
-          <Field label="Contact number" value={contact} onChange={setContact} placeholder="+91 80 4000 0000" />
+          <Field
+            label="Contact number"
+            value={contact}
+            onChange={setContact}
+            placeholder="+91 80 4000 0000"
+          />
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground">License / Certificate</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              License / Certificate
+            </label>
             <label className="mt-2 flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-border bg-background px-4 py-3 text-sm hover:border-foreground/40">
               <Upload className="h-4 w-4 text-muted-foreground" />
-              <span className="text-foreground">{licenseFile || "Upload license (PDF / image)"}</span>
+              <span className="text-foreground">
+                {licenseFile || "Upload license (PDF / image)"}
+              </span>
               <input
                 type="file"
                 className="sr-only"
@@ -215,7 +254,8 @@ function HospitalSignup() {
 
           <div>
             <label className="text-xs font-medium text-muted-foreground">
-              Departments {isClinic && <span className="text-foreground/60">(clinic limited to 1)</span>}
+              Departments{" "}
+              {isClinic && <span className="text-foreground/60">(clinic limited to 1)</span>}
             </label>
             <div className="mt-2 flex flex-wrap gap-2">
               {departments.map((d, i) => (
@@ -264,7 +304,11 @@ function HospitalSignup() {
             disabled={submitting}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-all hover:bg-mineral disabled:opacity-60"
           >
-            {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+            {submitting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ArrowRight className="h-4 w-4" />
+            )}
             Submit for review
           </button>
         </form>

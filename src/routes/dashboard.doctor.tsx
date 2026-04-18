@@ -52,7 +52,8 @@ function DoctorDashboard() {
     if (!user) return null;
     for (const f of facilities) {
       const d = f.doctors.find(
-        (doc) => doc.name.toLowerCase().replace(/^dr\.?\s*/i, "") ===
+        (doc) =>
+          doc.name.toLowerCase().replace(/^dr\.?\s*/i, "") ===
           user.name.toLowerCase().replace(/^dr\.?\s*/i, ""),
       );
       if (d) return { doctor: d, facility: f };
@@ -183,7 +184,12 @@ function Stats({
 }) {
   const stats = [
     { icon: Users, label: "Patients today", value: String(totalToday) },
-    { icon: AlertTriangle, label: "Critical", value: String(counts.critical), tone: "destructive" as const },
+    {
+      icon: AlertTriangle,
+      label: "Critical",
+      value: String(counts.critical),
+      tone: "destructive" as const,
+    },
     { icon: Clock, label: "Urgent", value: String(counts.urgent), tone: "warning" as const },
     { icon: TrendingUp, label: "Avg severity", value: avgSeverity, tone: "success" as const },
   ];
@@ -208,7 +214,9 @@ function Stats({
             <p className="text-xs text-muted-foreground">{s.label}</p>
             <s.icon className={`h-4 w-4 ${toneClass(s.tone)}`} />
           </div>
-          <p className="mt-2 font-display text-2xl font-semibold tracking-tight tabular-nums">{s.value}</p>
+          <p className="mt-2 font-display text-2xl font-semibold tracking-tight tabular-nums">
+            {s.value}
+          </p>
         </motion.div>
       ))}
     </div>
@@ -249,7 +257,9 @@ function FilterBar({
           >
             {o.label}
             {typeof o.count === "number" && (
-              <span className={`ml-1 ${active ? "text-background/70" : "text-muted-foreground/70"}`}>
+              <span
+                className={`ml-1 ${active ? "text-background/70" : "text-muted-foreground/70"}`}
+              >
                 {o.count}
               </span>
             )}
@@ -295,7 +305,9 @@ function PatientRow({
               <span className="text-xs text-muted-foreground"> · {patient.patient_age}</span>
             ) : null}
           </p>
-          <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.chip}`}>
+          <span
+            className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.chip}`}
+          >
             {m.label} · {patient.severity}/10
           </span>
         </div>
@@ -303,7 +315,9 @@ function PatientRow({
           {patient.main_symptom} · {patient.duration}
         </p>
         <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-          <span className={`rounded-full border px-1.5 py-0.5 text-[10px] font-semibold ${sm.chip}`}>
+          <span
+            className={`rounded-full border px-1.5 py-0.5 text-[10px] font-semibold ${sm.chip}`}
+          >
             {sm.label}
           </span>
           {isCritical && (
@@ -358,7 +372,10 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
           <h3 className="mt-1 truncate font-display text-xl font-semibold tracking-tight">
             {patient.patient_name}
             {patient.patient_age ? (
-              <span className="text-base font-normal text-muted-foreground"> · {patient.patient_age}</span>
+              <span className="text-base font-normal text-muted-foreground">
+                {" "}
+                · {patient.patient_age}
+              </span>
             ) : null}
           </h3>
           <p className="mt-0.5 truncate text-sm text-muted-foreground">
@@ -407,7 +424,9 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
             >
               <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.55_0.15_60)]" />
               <div>
-                <p className="font-semibold text-foreground">⚠️ Pre-existing condition: {patient.pre_existing}</p>
+                <p className="font-semibold text-foreground">
+                  ⚠️ Pre-existing condition: {patient.pre_existing}
+                </p>
                 <p>Consider drug interactions and comorbidity in your plan.</p>
               </div>
             </motion.div>
@@ -420,7 +439,9 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             Assigned ({patient.assignment.mode})
           </p>
-          <p className="mt-0.5 font-medium text-foreground">{patient.assignment.doctorName} · {patient.assignment.doctorSpecialty}</p>
+          <p className="mt-0.5 font-medium text-foreground">
+            {patient.assignment.doctorName} · {patient.assignment.doctorSpecialty}
+          </p>
           <p className="text-muted-foreground">
             {patient.assignment.facilityName} · {patient.assignment.departmentName}
             {patient.assignment.room ? ` · ${patient.assignment.room}` : ""}
@@ -454,7 +475,8 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
 
       <div className="mt-3 flex items-center justify-between">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          AI-drafted SOAP {patient.source === "ai" && <Sparkles className="ml-1 inline h-3 w-3 text-primary" />}
+          AI-drafted SOAP{" "}
+          {patient.source === "ai" && <Sparkles className="ml-1 inline h-3 w-3 text-primary" />}
         </p>
       </div>
       <textarea
@@ -483,7 +505,9 @@ function SoapPanel({ patient, onClear }: { patient: PatientRecord; onClear: () =
         )}
         {status === "accepted" && (
           <button
-            onClick={() => setStatus("in_consult", `Consultation started · ${patient.patient_name}`)}
+            onClick={() =>
+              setStatus("in_consult", `Consultation started · ${patient.patient_name}`)
+            }
             className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-all hover:bg-mineral hover:shadow-soft"
           >
             <Play className="h-3.5 w-3.5" /> Start consultation

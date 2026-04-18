@@ -93,17 +93,14 @@ export function addDepartment(facilityId: string, name: string) {
 
 export function addDoctor(
   facilityId: string,
-  data: { name: string; specialty: string; departmentId: string; room?: string }
+  data: { name: string; specialty: string; departmentId: string; room?: string },
 ) {
   const list = loadFacilities().map((f) => {
     if (f.id !== facilityId) return f;
     if (f.type === "Clinic" && f.doctors.length >= 1) return f;
     return {
       ...f,
-      doctors: [
-        ...f.doctors,
-        { id: crypto.randomUUID(), facilityId, available: true, ...data },
-      ],
+      doctors: [...f.doctors, { id: crypto.randomUUID(), facilityId, available: true, ...data }],
     };
   });
   saveFacilities(list);
@@ -111,7 +108,7 @@ export function addDoctor(
 
 export function deleteDoctor(facilityId: string, doctorId: string) {
   const list = loadFacilities().map((f) =>
-    f.id === facilityId ? { ...f, doctors: f.doctors.filter((d) => d.id !== doctorId) } : f
+    f.id === facilityId ? { ...f, doctors: f.doctors.filter((d) => d.id !== doctorId) } : f,
   );
   saveFacilities(list);
 }

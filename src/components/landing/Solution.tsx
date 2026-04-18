@@ -1,9 +1,21 @@
 import { Mic, Brain, LayoutDashboard, ArrowRight } from "lucide-react";
 
 const nodes = [
-  { icon: Mic, title: "Voice intake", body: "Patient describes symptoms naturally, in their language." },
-  { icon: Brain, title: "AI processing", body: "SOAP notes, triage, and follow-up questions in seconds." },
-  { icon: LayoutDashboard, title: "Smart dashboard", body: "Doctors review, edit, and prescribe — quickly." },
+  {
+    icon: Mic,
+    title: "Voice intake",
+    body: "Patient describes symptoms naturally, in their language.",
+  },
+  {
+    icon: Brain,
+    title: "AI processing",
+    body: "SOAP notes, triage, and follow-up questions in seconds.",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Smart dashboard",
+    body: "Doctors review, edit, and prescribe — quickly.",
+  },
 ];
 
 export function Solution() {
@@ -11,7 +23,9 @@ export function Solution() {
     <section className="py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="reveal max-w-2xl">
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">The solution</p>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            The solution
+          </p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             One quiet system that does the heavy lifting.
           </h2>

@@ -5,7 +5,9 @@ export function FutureReady() {
     <section className="border-t border-border/60 bg-secondary/30 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="reveal max-w-2xl">
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Future ready</p>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            Future ready
+          </p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             Built for what's next.
           </h2>

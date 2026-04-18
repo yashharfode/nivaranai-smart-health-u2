@@ -2,7 +2,14 @@ export function Logo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-label="NivaranAI logo">
       <defs>
-        <linearGradient id="nivaran-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="nivaran-grad"
+          x1="0"
+          y1="0"
+          x2="32"
+          y2="32"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="oklch(0.55 0.055 195)" />
           <stop offset="100%" stopColor="oklch(0.42 0.045 200)" />
         </linearGradient>

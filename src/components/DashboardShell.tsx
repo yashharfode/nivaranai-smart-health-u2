@@ -81,10 +81,15 @@ export function DashboardShell({
       <main className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-10">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <Link to="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+            >
               <ArrowLeft className="h-3 w-3" /> Back to site
             </Link>
-            <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
+            <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+              {title}
+            </h1>
             {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
           </div>
           {nav}

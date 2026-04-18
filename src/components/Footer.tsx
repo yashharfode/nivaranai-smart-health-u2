@@ -19,25 +19,62 @@ export function Footer() {
         <div>
           <p className="font-display text-sm font-semibold">Product</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li><a className="hover:text-foreground" href="/#features">Features</a></li>
-            <li><a className="hover:text-foreground" href="/#how">How it works</a></li>
-            <li><a className="hover:text-foreground" href="/#security">Security</a></li>
+            <li>
+              <a className="hover:text-foreground" href="/#features">
+                Features
+              </a>
+            </li>
+            <li>
+              <a className="hover:text-foreground" href="/#how">
+                How it works
+              </a>
+            </li>
+            <li>
+              <a className="hover:text-foreground" href="/#security">
+                Security
+              </a>
+            </li>
           </ul>
         </div>
         <div>
           <p className="font-display text-sm font-semibold">Account</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/login" className="hover:text-foreground">Login</Link></li>
-            <li><Link to="/signup/patient" className="hover:text-foreground">Patient signup</Link></li>
-            <li><Link to="/signup/doctor" className="hover:text-foreground">Doctor signup</Link></li>
-            <li><Link to="/signup/hospital" className="hover:text-foreground">Register hospital / clinic</Link></li>
-            <li><Link to="/admin-secret" className="text-xs text-muted-foreground/60 hover:text-foreground">Admin</Link></li>
+            <li>
+              <Link to="/login" className="hover:text-foreground">
+                Login
+              </Link>
+            </li>
+            <li>
+              <Link to="/signup/patient" className="hover:text-foreground">
+                Patient signup
+              </Link>
+            </li>
+            <li>
+              <Link to="/signup/doctor" className="hover:text-foreground">
+                Doctor signup
+              </Link>
+            </li>
+            <li>
+              <Link to="/signup/hospital" className="hover:text-foreground">
+                Register hospital / clinic
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/admin-secret"
+                className="text-xs text-muted-foreground/60 hover:text-foreground"
+              >
+                Admin
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
       <div className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-5 text-xs text-muted-foreground sm:flex-row sm:px-8">
-          <p>© {new Date().getFullYear()} NivaranAI. {t("footer.rights")}</p>
+          <p>
+            © {new Date().getFullYear()} NivaranAI. {t("footer.rights")}
+          </p>
           <p>Made with care for clinicians and patients.</p>
         </div>
       </div>

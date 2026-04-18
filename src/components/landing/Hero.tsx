@@ -59,7 +59,10 @@ export function Hero() {
 function HeroVisual() {
   return (
     <div className="relative">
-      <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-accent/40 to-transparent blur-2xl" aria-hidden />
+      <div
+        className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-accent/40 to-transparent blur-2xl"
+        aria-hidden
+      />
       <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-elevated">
         <div className="flex items-center justify-between border-b border-border/70 px-5 py-3">
           <div className="flex items-center gap-1.5">

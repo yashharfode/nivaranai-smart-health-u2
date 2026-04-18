@@ -1,9 +1,21 @@
 import { ShieldCheck, Lock, BadgeCheck } from "lucide-react";
 
 const items = [
-  { icon: Lock, title: "AES-256 encryption", body: "End-to-end protection for every consultation and record." },
-  { icon: BadgeCheck, title: "Verified doctors only", body: "Every clinician is reviewed before joining the platform." },
-  { icon: ShieldCheck, title: "Secure data handling", body: "Role-based access, audit logs, and zero-trust storage." },
+  {
+    icon: Lock,
+    title: "AES-256 encryption",
+    body: "End-to-end protection for every consultation and record.",
+  },
+  {
+    icon: BadgeCheck,
+    title: "Verified doctors only",
+    body: "Every clinician is reviewed before joining the platform.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Secure data handling",
+    body: "Role-based access, audit logs, and zero-trust storage.",
+  },
 ];
 
 export function Trust() {
@@ -11,7 +23,9 @@ export function Trust() {
     <section id="security" className="py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="reveal max-w-2xl">
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Trust & security</p>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            Trust & security
+          </p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             Quiet by design. Secure by default.
           </h2>

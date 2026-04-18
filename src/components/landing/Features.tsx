@@ -50,7 +50,9 @@ export function Features() {
     <section id="features" className="py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="reveal max-w-2xl">
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Capabilities</p>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            Capabilities
+          </p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             Everything a clinic needs, nothing it doesn't.
           </h2>

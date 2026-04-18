@@ -10,7 +10,9 @@ export function FinalCTA() {
             aria-hidden
             className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/15 blur-3xl"
           />
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">A note from the team</p>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            A note from the team
+          </p>
           <h2 className="mt-4 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-tight text-balance sm:text-4xl lg:text-5xl">
             We are not just building software. We are improving healthcare outcomes.
           </h2>

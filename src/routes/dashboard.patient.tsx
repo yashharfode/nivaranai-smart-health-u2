@@ -34,7 +34,13 @@ import {
 import { usePatients } from "@/hooks/usePatients";
 import { useFacilities } from "@/hooks/useFacilities";
 import { type Doctor, type Facility } from "@/lib/hospitals";
-import { isInIframe, isVoiceSupported, startVoice, type VoiceLang, type VoiceSession } from "@/lib/voice";
+import {
+  isInIframe,
+  isVoiceSupported,
+  startVoice,
+  type VoiceLang,
+  type VoiceSession,
+} from "@/lib/voice";
 
 export const Route = createFileRoute("/dashboard/patient")({
   head: () => ({ meta: [{ title: "Patient dashboard — NivaranAI" }] }),
@@ -78,7 +84,9 @@ function PatientWizard() {
 
   const [step, setStep] = useState<Step>(1);
   const [transcript, setTranscript] = useState("");
-  const [analysis, setAnalysis] = useState<(TriageResult & { suggested_department?: string }) | null>(null);
+  const [analysis, setAnalysis] = useState<
+    (TriageResult & { suggested_department?: string }) | null
+  >(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [assignment, setAssignment] = useState<Assignment | null>(null);
 
@@ -136,7 +144,12 @@ function PatientWizard() {
 
       <AnimatePresence mode="wait">
         {step === 1 && (
-          <motion.div key="s1" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
+          <motion.div
+            key="s1"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+          >
             <SymptomsStep
               transcript={transcript}
               setTranscript={setTranscript}
@@ -146,7 +159,12 @@ function PatientWizard() {
           </motion.div>
         )}
         {step === 2 && analysis && (
-          <motion.div key="s2" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
+          <motion.div
+            key="s2"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+          >
             <AssignStep
               analysis={analysis}
               facilities={facilities}
@@ -156,7 +174,12 @@ function PatientWizard() {
           </motion.div>
         )}
         {step === 3 && assignment && analysis && (
-          <motion.div key="s3" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
+          <motion.div
+            key="s3"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+          >
             <SuccessStep assignment={assignment} severity={analysis.severity} onAgain={reset} />
           </motion.div>
         )}
@@ -189,7 +212,9 @@ function Stepper({ step }: { step: Step }) {
             >
               {done ? <CheckCircle2 className="h-3.5 w-3.5" /> : it.n}
             </div>
-            <span className={`text-xs font-medium ${active || done ? "text-foreground" : "text-muted-foreground"}`}>
+            <span
+              className={`text-xs font-medium ${active || done ? "text-foreground" : "text-muted-foreground"}`}
+            >
               {it.label}
             </span>
             {i < items.length - 1 && <div className="h-px flex-1 bg-border" />}
@@ -287,9 +312,13 @@ function SymptomsStep({
             key={i}
             className="block w-1 rounded-full bg-primary/70"
             style={{
-              height: recording ? `${20 + Math.abs(Math.sin(i * 0.6 + Date.now() / 400)) * 75}%` : "20%",
+              height: recording
+                ? `${20 + Math.abs(Math.sin(i * 0.6 + Date.now() / 400)) * 75}%`
+                : "20%",
               transition: "height 200ms ease",
-              animation: recording ? `waveform 1.${(i % 9) + 1}s ease-in-out ${i * 0.04}s infinite` : undefined,
+              animation: recording
+                ? `waveform 1.${(i % 9) + 1}s ease-in-out ${i * 0.04}s infinite`
+                : undefined,
               transformOrigin: "bottom",
             }}
           />
@@ -326,9 +355,9 @@ function SymptomsStep({
 
       {supported && isInIframe() && (
         <div className="mt-3 rounded-xl border border-warning/30 bg-warning/10 p-2.5 text-center text-[11px] text-foreground/80">
-          Mic may be blocked inside the preview iframe. If "Start speaking" does
-          nothing, click the <span className="font-semibold">↗ Open in new tab</span> button at
-          the top of the preview, or just type your symptoms below.
+          Mic may be blocked inside the preview iframe. If "Start speaking" does nothing, click the{" "}
+          <span className="font-semibold">↗ Open in new tab</span> button at the top of the preview,
+          or just type your symptoms below.
         </div>
       )}
 
@@ -393,7 +422,8 @@ function AssignStep({
   const [doctorId, setDoctorId] = useState("");
 
   const selectedFacility = facilities.find((f) => f.id === facilityId);
-  const departmentDoctors = selectedFacility?.doctors.filter((d) => d.departmentId === departmentId) ?? [];
+  const departmentDoctors =
+    selectedFacility?.doctors.filter((d) => d.departmentId === departmentId) ?? [];
 
   const buildAssignment = (
     f: Facility,
@@ -435,7 +465,9 @@ function AssignStep({
       const doc = f.doctors.find((d) => d.available !== false);
       if (doc) {
         const dDept = f.departments.find((d) => d.id === doc.departmentId);
-        return onAssign(buildAssignment(f, dDept?.name ?? "General", doc.departmentId, doc, "auto"));
+        return onAssign(
+          buildAssignment(f, dDept?.name ?? "General", doc.departmentId, doc, "auto"),
+        );
       }
     }
     toast.error("No approved doctors available right now. Please try manual selection.");
@@ -480,7 +512,8 @@ function AssignStep({
         {analysis.suggested_department && (
           <p className="mt-2 text-xs">
             <Sparkles className="mr-1 inline h-3 w-3 text-primary" />
-            Suggested department: <span className="font-semibold text-foreground">{analysis.suggested_department}</span>
+            Suggested department:{" "}
+            <span className="font-semibold text-foreground">{analysis.suggested_department}</span>
           </p>
         )}
       </div>
@@ -535,7 +568,10 @@ function AssignStep({
               setDoctorId("");
             }}
             placeholder={selectedFacility ? "Select department" : "Pick facility first"}
-            options={(selectedFacility?.departments ?? []).map((d) => ({ value: d.id, label: d.name }))}
+            options={(selectedFacility?.departments ?? []).map((d) => ({
+              value: d.id,
+              label: d.name,
+            }))}
             disabled={!selectedFacility}
           />
           <Select
@@ -593,7 +629,9 @@ function ModeButton({
       <Icon className="h-4 w-4 shrink-0" />
       <div>
         <div className="font-medium">{label}</div>
-        <div className={`text-xs ${active ? "text-background/70" : "text-muted-foreground"}`}>{desc}</div>
+        <div className={`text-xs ${active ? "text-background/70" : "text-muted-foreground"}`}>
+          {desc}
+        </div>
       </div>
     </button>
   );
@@ -616,7 +654,9 @@ function Select({
 }) {
   return (
     <div>
-      <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</label>
+      <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -655,7 +695,8 @@ function SuccessStep({
       </div>
       <h2 className="mt-1 font-display text-2xl font-semibold tracking-tight">You're booked in</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        {assignment.mode === "auto" ? "AI auto-assigned" : "You chose"} the best-fit doctor based on your symptoms.
+        {assignment.mode === "auto" ? "AI auto-assigned" : "You chose"} the best-fit doctor based on
+        your symptoms.
       </p>
 
       <motion.div
@@ -669,10 +710,15 @@ function SuccessStep({
             <Stethoscope className="h-6 w-6" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">{assignment.doctorSpecialty}</p>
-            <h3 className="font-display text-lg font-semibold leading-tight">{assignment.doctorName}</h3>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              {assignment.doctorSpecialty}
+            </p>
+            <h3 className="font-display text-lg font-semibold leading-tight">
+              {assignment.doctorName}
+            </h3>
             <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-              <Icon className="h-3.5 w-3.5" /> {assignment.facilityName} · {assignment.departmentName}
+              <Icon className="h-3.5 w-3.5" /> {assignment.facilityName} ·{" "}
+              {assignment.departmentName}
             </div>
             {assignment.room && (
               <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-foreground">
@@ -680,7 +726,9 @@ function SuccessStep({
               </div>
             )}
           </div>
-          <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.chip}`}>
+          <span
+            className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.chip}`}
+          >
             {m.label}
           </span>
         </div>
@@ -733,7 +781,9 @@ function QueueCard({
           <div className="mt-6 rounded-2xl bg-secondary/60 p-4">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">Triage priority</p>
-              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${priorityMeta[latest.priority].chip}`}>
+              <span
+                className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${priorityMeta[latest.priority].chip}`}
+              >
                 {priorityMeta[latest.priority].label}
               </span>
             </div>
@@ -752,7 +802,9 @@ function QueueCard({
 
           {/* Live status timeline */}
           <div className="mt-5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Live status</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Live status
+            </p>
             {status === "rejected" ? (
               <div className="mt-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
                 ❌ The doctor has declined this consultation. Please try another doctor.
@@ -775,7 +827,9 @@ function QueueCard({
                       >
                         {done ? "✓" : i + 1}
                       </span>
-                      <span className={`text-xs ${active ? "font-semibold text-foreground" : done ? "text-foreground" : "text-muted-foreground"}`}>
+                      <span
+                        className={`text-xs ${active ? "font-semibold text-foreground" : done ? "text-foreground" : "text-muted-foreground"}`}
+                      >
                         {s.label}
                         {active && <span className="ml-1.5 text-primary">· now</span>}
                       </span>
@@ -793,7 +847,9 @@ function QueueCard({
         </>
       ) : (
         <>
-          <p className="mt-4 font-display text-4xl font-semibold tracking-tight text-muted-foreground">—</p>
+          <p className="mt-4 font-display text-4xl font-semibold tracking-tight text-muted-foreground">
+            —
+          </p>
           <p className="mt-1 text-sm text-muted-foreground">No active consultation</p>
           <div className="mt-6 rounded-2xl bg-secondary/60 p-4 text-xs text-muted-foreground">
             Speak your symptoms to join the queue. The doctor will see your SOAP note instantly.
@@ -820,7 +876,8 @@ function SubmissionsCard({ records }: { records: PatientRecord[] }) {
 
       {records.length === 0 ? (
         <div className="mt-5 rounded-2xl border border-dashed border-border bg-background/60 p-8 text-center text-sm text-muted-foreground">
-          Nothing here yet — your past consultations will appear once you send symptoms to the doctor.
+          Nothing here yet — your past consultations will appear once you send symptoms to the
+          doctor.
         </div>
       ) : (
         <ol className="mt-5 space-y-2">
@@ -841,7 +898,9 @@ function SubmissionsCard({ records }: { records: PatientRecord[] }) {
                       {r.assignment && ` · ${r.assignment.doctorName}`}
                     </p>
                   </div>
-                  <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.chip}`}>
+                  <span
+                    className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.chip}`}
+                  >
                     {m.label}
                   </span>
                 </button>
@@ -857,7 +916,9 @@ function SubmissionsCard({ records }: { records: PatientRecord[] }) {
                       <div className="space-y-3 border-t border-border px-4 py-4 text-sm">
                         {r.assignment && (
                           <div className="rounded-xl bg-secondary/60 p-3 text-xs">
-                            <p className="font-semibold text-foreground">{r.assignment.doctorName}</p>
+                            <p className="font-semibold text-foreground">
+                              {r.assignment.doctorName}
+                            </p>
                             <p className="text-muted-foreground">
                               {r.assignment.facilityName} · {r.assignment.departmentName}
                               {r.assignment.room ? ` · ${r.assignment.room}` : ""}

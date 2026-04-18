@@ -129,18 +129,12 @@ function DemoPage() {
         </section>
 
         <section className="lg:col-span-7">
-          <TriageDashboard
-            patients={sorted}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-          />
+          <TriageDashboard patients={sorted} selectedId={selectedId} onSelect={setSelectedId} />
         </section>
       </main>
 
       <AnimatePresence>
-        {selected && (
-          <SoapPanel patient={selected} onClose={() => setSelectedId(null)} />
-        )}
+        {selected && <SoapPanel patient={selected} onClose={() => setSelectedId(null)} />}
       </AnimatePresence>
     </div>
   );
@@ -238,7 +232,9 @@ function Kiosk({ onAdd }: { onAdd: (p: PatientRecord) => void }) {
     <div className="rounded-3xl border border-border bg-card/80 p-6 shadow-elevated backdrop-blur">
       <div className="flex items-start justify-between">
         <div>
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Patient kiosk</p>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            Patient kiosk
+          </p>
           <h2 className="mt-1 font-display text-xl font-semibold tracking-tight">
             Describe your symptoms
           </h2>
@@ -269,9 +265,13 @@ function Kiosk({ onAdd }: { onAdd: (p: PatientRecord) => void }) {
             key={i}
             className="block w-1 rounded-full bg-primary/70"
             style={{
-              height: recording ? `${20 + Math.abs(Math.sin(i * 0.6 + Date.now() / 400)) * 75}%` : "20%",
+              height: recording
+                ? `${20 + Math.abs(Math.sin(i * 0.6 + Date.now() / 400)) * 75}%`
+                : "20%",
               transition: "height 200ms ease",
-              animation: recording ? `waveform 1.${(i % 9) + 1}s ease-in-out ${i * 0.04}s infinite` : undefined,
+              animation: recording
+                ? `waveform 1.${(i % 9) + 1}s ease-in-out ${i * 0.04}s infinite`
+                : undefined,
               transformOrigin: "bottom",
             }}
           />
@@ -380,8 +380,12 @@ function TriageDashboard({
     <div className="rounded-3xl border border-border bg-card/80 p-6 shadow-elevated backdrop-blur">
       <div className="flex items-center justify-between">
         <div>
-          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">Triage queue</p>
-          <h2 className="mt-1 font-display text-xl font-semibold tracking-tight">Patients sorted by priority</h2>
+          <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+            Triage queue
+          </p>
+          <h2 className="mt-1 font-display text-xl font-semibold tracking-tight">
+            Patients sorted by priority
+          </h2>
         </div>
         <Activity className="h-5 w-5 text-primary" />
       </div>
@@ -471,7 +475,9 @@ function PatientCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
           <p className="truncate font-medium text-foreground">{patient.patient_name}</p>
-          <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.chip}`}>
+          <span
+            className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.chip}`}
+          >
             {m.label} · {patient.severity}/10
           </span>
         </div>
@@ -515,7 +521,9 @@ function SoapPanel({ patient, onClose }: { patient: PatientRecord; onClose: () =
 
       <div className="flex-1 overflow-y-auto px-6 py-5">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-display text-2xl font-semibold tracking-tight">{patient.patient_name}</h3>
+          <h3 className="font-display text-2xl font-semibold tracking-tight">
+            {patient.patient_name}
+          </h3>
           <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${m.chip}`}>
             {m.label} · {patient.severity}/10
           </span>
@@ -528,7 +536,9 @@ function SoapPanel({ patient, onClose }: { patient: PatientRecord; onClose: () =
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Patient said
           </p>
-          <p className="mt-1 text-sm italic leading-relaxed text-foreground">"{patient.transcript}"</p>
+          <p className="mt-1 text-sm italic leading-relaxed text-foreground">
+            "{patient.transcript}"
+          </p>
         </div>
 
         <SoapSection label="Subjective" body={patient.soap.subjective} />

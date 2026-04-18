@@ -1,6 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Lock, Check, X, Trash2, Plus, Building2, Stethoscope, ShieldCheck, Search, Copy, KeyRound } from "lucide-react";
+import {
+  Lock,
+  Check,
+  X,
+  Trash2,
+  Plus,
+  Building2,
+  Stethoscope,
+  ShieldCheck,
+  Search,
+  Copy,
+  KeyRound,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { useFacilities } from "@/hooks/useFacilities";
@@ -35,35 +47,52 @@ function AdminPage() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="mx-auto flex min-h-[70vh] max-w-md items-center px-5">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (pw === ADMIN_PASSWORD) setAuthed(true);
-              else toast.error("Incorrect password");
-            }}
-            className="w-full rounded-3xl border border-border bg-card p-8 shadow-soft"
-          >
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-foreground text-background">
-              <Lock className="h-5 w-5" />
+        <main className="mx-auto flex max-w-7xl items-center justify-center px-5 py-16 sm:px-8 sm:py-24">
+          <div className="w-full max-w-md">
+            <div className="text-center">
+              <p className="font-display text-xs uppercase tracking-[0.18em] text-primary">
+                System Override
+              </p>
+              <div className="mt-2 flex justify-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-foreground text-background shadow-soft">
+                  <Lock className="h-5 w-5" />
+                </div>
+              </div>
+              <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight">
+                Admin Access
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Restricted area. Authorized personnel only.
+              </p>
             </div>
-            <h1 className="font-display mt-4 text-center text-2xl font-semibold">Admin access</h1>
-            <p className="mt-1 text-center text-sm text-muted-foreground">Restricted area.</p>
-            <input
-              type="password"
-              autoFocus
-              value={pw}
-              onChange={(e) => setPw(e.target.value)}
-              placeholder="Password"
-              className="mt-6 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-foreground"
-            />
-            <button
-              type="submit"
-              className="mt-3 w-full rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background hover:bg-mineral"
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (pw === ADMIN_PASSWORD) setAuthed(true);
+                else toast.error("Incorrect password");
+              }}
+              className="mt-8 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8"
             >
-              Unlock
-            </button>
-          </form>
+              <label className="block text-xs font-medium text-muted-foreground">
+                Master Password
+              </label>
+              <input
+                type="password"
+                autoFocus
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
+                placeholder="••••••••"
+                className="mt-1.5 w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-ring/30"
+              />
+              <button
+                type="submit"
+                className="mt-6 w-full rounded-full bg-foreground px-5 py-3 text-sm font-medium text-background transition-all hover:bg-mineral"
+              >
+                Authenticate
+              </button>
+            </form>
+          </div>
         </main>
       </div>
     );
@@ -75,7 +104,10 @@ function AdminPage() {
 function AdminDashboard() {
   const facilities = useFacilities();
   const [query, setQuery] = useState("");
-  const [credModal, setCredModal] = useState<{ cred: HospitalCredentials; facilityName: string } | null>(null);
+  const [credModal, setCredModal] = useState<{
+    cred: HospitalCredentials;
+    facilityName: string;
+  } | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -115,7 +147,9 @@ function AdminDashboard() {
               Facility management
             </h1>
           </div>
-          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">← Home</Link>
+          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">
+            ← Home
+          </Link>
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -136,12 +170,12 @@ function AdminDashboard() {
 
         <Section title="Pending review" facilities={pending} onApprove={handleApprove} />
         <Section title="Approved" facilities={approved} onApprove={handleApprove} />
-        {rejected.length > 0 && <Section title="Rejected" facilities={rejected} onApprove={handleApprove} />}
+        {rejected.length > 0 && (
+          <Section title="Rejected" facilities={rejected} onApprove={handleApprove} />
+        )}
       </main>
 
-      {credModal && (
-        <CredentialsModal {...credModal} onClose={() => setCredModal(null)} />
-      )}
+      {credModal && <CredentialsModal {...credModal} onClose={() => setCredModal(null)} />}
     </div>
   );
 }
@@ -177,7 +211,13 @@ function Section({
   );
 }
 
-function FacilityCard({ facility, onApprove }: { facility: Facility; onApprove: (f: Facility) => void }) {
+function FacilityCard({
+  facility,
+  onApprove,
+}: {
+  facility: Facility;
+  onApprove: (f: Facility) => void;
+}) {
   const [open, setOpen] = useState(facility.status === "pending");
   const Icon = facility.type === "Hospital" ? Building2 : Stethoscope;
   const app = findApplicationByFacility(facility.id);
@@ -204,7 +244,9 @@ function FacilityCard({ facility, onApprove }: { facility: Facility; onApprove: 
               {facility.type} · {facility.location} · {facility.contact}
             </p>
             {facility.email && <p className="text-xs text-muted-foreground">📧 {facility.email}</p>}
-            {facility.licenseFile && <p className="mt-1 text-xs text-foreground/70">📎 {facility.licenseFile}</p>}
+            {facility.licenseFile && (
+              <p className="mt-1 text-xs text-foreground/70">📎 {facility.licenseFile}</p>
+            )}
           </div>
         </div>
 
@@ -266,7 +308,9 @@ function StatusChip({ status }: { status: Facility["status"] }) {
     rejected: "bg-destructive/10 text-destructive border-destructive/20",
   } as const;
   return (
-    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${map[status]}`}>
+    <span
+      className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${map[status]}`}
+    >
       {status}
     </span>
   );
@@ -274,7 +318,13 @@ function StatusChip({ status }: { status: Facility["status"] }) {
 
 function ManagePanel({ facility }: { facility: Facility }) {
   const [deptName, setDeptName] = useState("");
-  const [doc, setDoc] = useState({ name: "", specialty: "", departmentId: "", room: "", email: "" });
+  const [doc, setDoc] = useState({
+    name: "",
+    specialty: "",
+    departmentId: "",
+    room: "",
+    email: "",
+  });
   const isClinic = facility.type === "Clinic";
   const clinicLockedDept = isClinic && facility.departments.length >= 1;
   const clinicLockedDoc = isClinic && facility.doctors.length >= 1;
@@ -282,12 +332,21 @@ function ManagePanel({ facility }: { facility: Facility }) {
   return (
     <div className="mt-4 grid gap-4 border-t border-border pt-4 md:grid-cols-2">
       <div>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Departments</h4>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Departments
+        </h4>
         <div className="mt-2 space-y-1.5">
           {facility.departments.map((d) => (
-            <div key={d.id} className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm">{d.name}</div>
+            <div
+              key={d.id}
+              className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm"
+            >
+              {d.name}
+            </div>
           ))}
-          {facility.departments.length === 0 && <p className="text-xs text-muted-foreground">No departments yet.</p>}
+          {facility.departments.length === 0 && (
+            <p className="text-xs text-muted-foreground">No departments yet.</p>
+          )}
         </div>
         {!clinicLockedDept && (
           <div className="mt-2 flex gap-2">
@@ -312,44 +371,85 @@ function ManagePanel({ facility }: { facility: Facility }) {
       </div>
 
       <div>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Doctors</h4>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Doctors
+        </h4>
         <div className="mt-2 space-y-1.5">
           {facility.doctors.map((d) => {
             const dept = facility.departments.find((x) => x.id === d.departmentId);
             return (
-              <div key={d.id} className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-sm">
+              <div
+                key={d.id}
+                className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 text-sm"
+              >
                 <div>
                   <div className="font-medium">{d.name}</div>
-                  <div className="text-xs text-muted-foreground">{d.specialty} · {dept?.name ?? "—"} · {d.room ?? "—"}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {d.specialty} · {dept?.name ?? "—"} · {d.room ?? "—"}
+                  </div>
                 </div>
-                <button onClick={() => deleteDoctor(facility.id, d.id)} className="rounded-md p-1 text-destructive hover:bg-destructive/10">
+                <button
+                  onClick={() => deleteDoctor(facility.id, d.id)}
+                  className="rounded-md p-1 text-destructive hover:bg-destructive/10"
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             );
           })}
-          {facility.doctors.length === 0 && <p className="text-xs text-muted-foreground">No doctors yet.</p>}
+          {facility.doctors.length === 0 && (
+            <p className="text-xs text-muted-foreground">No doctors yet.</p>
+          )}
         </div>
         {!clinicLockedDoc && facility.departments.length > 0 && (
           <div className="mt-2 grid gap-1.5">
-            <input value={doc.name} onChange={(e) => setDoc({ ...doc, name: e.target.value })} placeholder="Dr. Name"
-              className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground" />
+            <input
+              value={doc.name}
+              onChange={(e) => setDoc({ ...doc, name: e.target.value })}
+              placeholder="Dr. Name"
+              className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground"
+            />
             <div className="grid grid-cols-2 gap-1.5">
-              <input value={doc.specialty} onChange={(e) => setDoc({ ...doc, specialty: e.target.value })} placeholder="Specialty"
-                className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground" />
-              <input value={doc.room} onChange={(e) => setDoc({ ...doc, room: e.target.value })} placeholder="Room"
-                className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground" />
+              <input
+                value={doc.specialty}
+                onChange={(e) => setDoc({ ...doc, specialty: e.target.value })}
+                placeholder="Specialty"
+                className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground"
+              />
+              <input
+                value={doc.room}
+                onChange={(e) => setDoc({ ...doc, room: e.target.value })}
+                placeholder="Room"
+                className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground"
+              />
             </div>
-            <input type="email" value={doc.email} onChange={(e) => setDoc({ ...doc, email: e.target.value })} placeholder="Doctor email (required)"
-              className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground" />
-            <select value={doc.departmentId} onChange={(e) => setDoc({ ...doc, departmentId: e.target.value })}
-              className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground">
+            <input
+              type="email"
+              value={doc.email}
+              onChange={(e) => setDoc({ ...doc, email: e.target.value })}
+              placeholder="Doctor email (required)"
+              className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground"
+            />
+            <select
+              value={doc.departmentId}
+              onChange={(e) => setDoc({ ...doc, departmentId: e.target.value })}
+              className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none focus:border-foreground"
+            >
               <option value="">Select department</option>
-              {facility.departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+              {facility.departments.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
             </select>
             <button
               onClick={() => {
-                if (!doc.name.trim() || !doc.specialty.trim() || !doc.departmentId || !doc.email.trim()) {
+                if (
+                  !doc.name.trim() ||
+                  !doc.specialty.trim() ||
+                  !doc.departmentId ||
+                  !doc.email.trim()
+                ) {
                   toast.error("Name, specialty, department, and email required.");
                   return;
                 }
@@ -399,7 +499,10 @@ function CredentialsModal({
             <h2 className="font-display mt-3 text-xl font-semibold">Hospital Approved ✅</h2>
             <p className="mt-1 text-sm text-muted-foreground">{facilityName}</p>
           </div>
-          <button onClick={onClose} className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary">
+          <button
+            onClick={onClose}
+            className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary"
+          >
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -408,14 +511,29 @@ function CredentialsModal({
           <p className="text-xs uppercase tracking-wider text-primary">Generated credentials</p>
 
           <div className="mt-3 space-y-2">
-            <CredRow label="Username" value={cred.username} onCopy={() => copy(cred.username, "Username")} />
-            <CredRow label="Password" value={cred.password} onCopy={() => copy(cred.password, "Password")} mono />
-            <CredRow label="Application ID" value={cred.applicationId} onCopy={() => copy(cred.applicationId, "Application ID")} mono />
+            <CredRow
+              label="Username"
+              value={cred.username}
+              onCopy={() => copy(cred.username, "Username")}
+            />
+            <CredRow
+              label="Password"
+              value={cred.password}
+              onCopy={() => copy(cred.password, "Password")}
+              mono
+            />
+            <CredRow
+              label="Application ID"
+              value={cred.applicationId}
+              onCopy={() => copy(cred.applicationId, "Application ID")}
+              mono
+            />
           </div>
         </div>
 
         <div className="mt-4 rounded-xl bg-warning/10 p-3 text-xs text-foreground/80">
-          ⚠️ Please share these credentials with the hospital via email. They will not be shown again.
+          ⚠️ Please share these credentials with the hospital via email. They will not be shown
+          again.
         </div>
 
         <button
@@ -429,14 +547,29 @@ function CredentialsModal({
   );
 }
 
-function CredRow({ label, value, onCopy, mono }: { label: string; value: string; onCopy: () => void; mono?: boolean }) {
+function CredRow({
+  label,
+  value,
+  onCopy,
+  mono,
+}: {
+  label: string;
+  value: string;
+  onCopy: () => void;
+  mono?: boolean;
+}) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-3 py-2">
       <div className="min-w-0">
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
-        <p className={`truncate text-sm font-semibold text-foreground ${mono ? "font-mono" : ""}`}>{value}</p>
+        <p className={`truncate text-sm font-semibold text-foreground ${mono ? "font-mono" : ""}`}>
+          {value}
+        </p>
       </div>
-      <button onClick={onCopy} className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground">
+      <button
+        onClick={onCopy}
+        className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
+      >
         <Copy className="h-3.5 w-3.5" />
       </button>
     </div>

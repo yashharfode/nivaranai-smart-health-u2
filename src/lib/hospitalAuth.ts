@@ -73,15 +73,29 @@ export function saveCredentials(list: HospitalCredentials[]) {
   window.dispatchEvent(new CustomEvent(CREDS_EVENT, { detail: list }));
 }
 
-export function generateCredentials(facilityName: string, facilityId: string, applicationId: string): HospitalCredentials {
-  const slug = facilityName.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 12) || "hospital";
+export function generateCredentials(
+  facilityName: string,
+  facilityId: string,
+  applicationId: string,
+): HospitalCredentials {
+  const slug =
+    facilityName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "")
+      .slice(0, 12) || "hospital";
   const username = `${slug}${Math.floor(100 + Math.random() * 900)}`;
   // Memorable but secure-looking password
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghijkmnpqrstuvwxyz";
   let password = "";
   for (let i = 0; i < 12; i++) password += chars[Math.floor(Math.random() * chars.length)];
   password += "!" + Math.floor(10 + Math.random() * 90);
-  const cred: HospitalCredentials = { facilityId, applicationId, username, password, createdAt: Date.now() };
+  const cred: HospitalCredentials = {
+    facilityId,
+    applicationId,
+    username,
+    password,
+    createdAt: Date.now(),
+  };
   const list = loadCredentials();
   saveCredentials([cred, ...list.filter((c) => c.facilityId !== facilityId)]);
   return cred;
@@ -91,7 +105,10 @@ export function findCredentialsByFacility(facilityId: string): HospitalCredentia
   return loadCredentials().find((c) => c.facilityId === facilityId);
 }
 
-export function verifyHospitalLogin(username: string, password: string): HospitalCredentials | null {
+export function verifyHospitalLogin(
+  username: string,
+  password: string,
+): HospitalCredentials | null {
   const c = loadCredentials().find(
     (x) => x.username.toLowerCase() === username.trim().toLowerCase() && x.password === password,
   );

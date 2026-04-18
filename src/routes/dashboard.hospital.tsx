@@ -39,7 +39,10 @@ function HospitalDashboard() {
           <p className="mt-2 text-sm text-muted-foreground">
             Your facility record may have been removed. Please contact admin.
           </p>
-          <Link to="/login/hospital" className="mt-4 inline-block text-sm text-primary hover:underline">
+          <Link
+            to="/login/hospital"
+            className="mt-4 inline-block text-sm text-primary hover:underline"
+          >
             Back to login
           </Link>
         </main>
@@ -56,7 +59,9 @@ function HospitalDashboard() {
             <ShieldCheck className="mx-auto h-8 w-8 text-warning" />
             <h1 className="font-display mt-3 text-2xl font-semibold">Awaiting approval</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Your facility is currently <span className="font-semibold capitalize text-foreground">{facility.status}</span>. You'll be able to manage departments and doctors once approved.
+              Your facility is currently{" "}
+              <span className="font-semibold capitalize text-foreground">{facility.status}</span>.
+              You'll be able to manage departments and doctors once approved.
             </p>
           </div>
         </main>
@@ -111,12 +116,17 @@ function DepartmentsPanel({ facility }: { facility: Facility }) {
     <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
       <h2 className="font-display text-lg font-semibold">Departments</h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        {isClinic ? "Clinics support a single department." : "Add as many specialties as you offer."}
+        {isClinic
+          ? "Clinics support a single department."
+          : "Add as many specialties as you offer."}
       </p>
 
       <div className="mt-4 space-y-1.5">
         {facility.departments.map((d) => (
-          <div key={d.id} className="rounded-xl border border-border bg-background px-3 py-2 text-sm">
+          <div
+            key={d.id}
+            className="rounded-xl border border-border bg-background px-3 py-2 text-sm"
+          >
             {d.name}
           </div>
         ))}
@@ -151,7 +161,13 @@ function DepartmentsPanel({ facility }: { facility: Facility }) {
 }
 
 function DoctorsPanel({ facility }: { facility: Facility }) {
-  const [doc, setDoc] = useState({ name: "", specialty: "", departmentId: "", room: "", email: "" });
+  const [doc, setDoc] = useState({
+    name: "",
+    specialty: "",
+    departmentId: "",
+    room: "",
+    email: "",
+  });
   const isClinic = facility.type === "Clinic";
   const locked = isClinic && facility.doctors.length >= 1;
 
@@ -246,7 +262,9 @@ function DoctorsPanel({ facility }: { facility: Facility }) {
           >
             <option value="">Select department</option>
             {facility.departments.map((d) => (
-              <option key={d.id} value={d.id}>{d.name}</option>
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
             ))}
           </select>
           <div className="relative">
