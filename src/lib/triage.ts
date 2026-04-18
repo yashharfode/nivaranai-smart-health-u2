@@ -116,7 +116,24 @@ export function savePatients(patients: PatientRecord[]) {
 
 export function addPatient(rec: PatientRecord) {
   const list = loadPatients();
-  const next = [rec, ...list];
+  // Attach prior visits for this patient (by name) as history.
+  const prior = list
+    .filter((p) => p.patient_name.toLowerCase() === rec.patient_name.toLowerCase())
+    .slice(0, 8)
+    .map<PatientHistoryEntry>((p) => ({
+      id: p.id,
+      timestamp: p.timestamp,
+      main_symptom: p.main_symptom,
+      severity: p.severity,
+    }));
+  const enriched: PatientRecord = { ...rec, history: prior };
+  const next = [enriched, ...list];
+  savePatients(next);
+  return next;
+}
+
+export function updatePatient(id: string, patch: Partial<PatientRecord>) {
+  const next = loadPatients().map((p) => (p.id === id ? { ...p, ...patch } : p));
   savePatients(next);
   return next;
 }
@@ -157,7 +174,7 @@ function seedPatients(): PatientRecord[] {
       duration: "2 days",
       severity: 4,
       priority: "normal",
-      status: "waiting",
+      status: "pending",
       timestamp: now - 1000 * 60 * 14,
       soap: {
         subjective: "Fever ~100°F with sore throat for 2 days. Mild difficulty swallowing, no body ache.",
@@ -175,7 +192,8 @@ function seedPatients(): PatientRecord[] {
       duration: "Since morning",
       severity: 7,
       priority: "urgent",
-      status: "waiting",
+      status: "pending",
+      pre_existing: "Hypertension",
       timestamp: now - 1000 * 60 * 8,
       soap: {
         subjective: "Severe throbbing headache since morning. Known hypertensive.",

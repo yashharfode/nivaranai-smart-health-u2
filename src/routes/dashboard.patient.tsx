@@ -119,7 +119,7 @@ function PatientWizard() {
       patient_gender: (user as any)?.gender,
       transcript,
       priority,
-      status: "waiting",
+      status: "pending",
       timestamp: Date.now(),
       assignment: a,
       suggested_department: analysis.suggested_department,
