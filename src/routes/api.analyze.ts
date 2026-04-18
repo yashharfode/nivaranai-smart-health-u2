@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 const SYSTEM = `You are a careful clinical assistant supporting a triage workflow in India.
-A patient describes their symptoms in plain English or Hindi. Extract structured data and draft a SOAP note in clear, simple English.
+A patient describes their symptoms in plain English or Hindi. Extract structured data, draft a SOAP note, and pick the most appropriate hospital department.
 
 Severity guide (1-10):
 - 1-4: routine (mild discomfort, no red flags)
 - 5-7: urgent (significant symptoms, no immediate danger)
 - 8-10: critical (chest pain, breathlessness, severe bleeding, stroke signs, syncope, anaphylaxis)
 
-Be conservative: when in doubt about red flags, score higher.`;
+Be conservative: when in doubt about red flags, score higher.
+For department, ALWAYS pick exactly one from the provided list of available departments. If none fit well, pick "General Medicine" (or the closest equivalent in the list).`;
 
 const fallback = (transcript: string) => {
   const t = transcript.toLowerCase();
@@ -56,9 +57,15 @@ export const Route = createFileRoute("/api/analyze")({
     handlers: {
       POST: async ({ request }) => {
         let transcript = "";
+        let availableDepartments: string[] = [];
         try {
           const body = await request.json();
           transcript = String(body?.transcript ?? "").slice(0, 2000);
+          if (Array.isArray(body?.availableDepartments)) {
+            availableDepartments = body.availableDepartments
+              .filter((d: unknown) => typeof d === "string")
+              .slice(0, 30);
+          }
         } catch {
           return Response.json({ error: "Invalid JSON" }, { status: 400 });
         }
@@ -68,7 +75,12 @@ export const Route = createFileRoute("/api/analyze")({
 
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) {
-          return Response.json({ ...fallback(transcript), source: "fallback" });
+          const fb = fallback(transcript);
+          return Response.json({
+            ...fb,
+            suggested_department: pickFallbackDept(transcript, availableDepartments),
+            source: "fallback",
+          });
         }
 
         try {
