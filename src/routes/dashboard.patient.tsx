@@ -6,18 +6,13 @@ import {
   Mic,
   MicOff,
   Loader2,
-  Sparkles,
-  Languages,
   Clock,
   FileText,
   Activity,
   CheckCircle2,
   Building2,
   Stethoscope,
-  Wand2,
-  ListChecks,
   ChevronRight,
-  ArrowLeft,
   MapPin,
   Send,
   AlertTriangle,
@@ -38,7 +33,6 @@ import { usePatients } from "@/hooks/usePatients";
 import { useFacilities } from "@/hooks/useFacilities";
 import { type Doctor, type Facility } from "@/lib/hospitals";
 import {
-  isInIframe,
   isVoiceSupported,
   startVoice,
   type VoiceLang,
@@ -488,7 +482,7 @@ function ChatIntakeStep({
 
     setIsTyping(true);
     
-    // UPDATED: Using Env Variable for API Key
+    // API KEY is taken from .env here
     const askGemini = async () => {
       try {
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -520,7 +514,6 @@ Do not provide a diagnosis. Do not output anything other than the question. Maxi
       } catch (e: any) {
         console.error("Gemini API Error:", e.message || e);
         
-        // Fallback logic remains the same
         let q = "Can you provide more details?";
         const lastUser = submittedText.toLowerCase();
         
@@ -550,9 +543,370 @@ Do not provide a diagnosis. Do not output anything other than the question. Maxi
     onNext(userReplies.map(m => m.text).join(". "));
   };
 
+  // ✅ Here is where your code got cut last time. Now it's full.
   return (
     <div className="flex flex-col space-y-4 h-[550px]">
-      {/* Chat History */}
       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
         {messages.map((m, idx) => (
- 
+          <div key={idx} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
+              m.role === "user" 
+                ? "bg-primary text-primary-foreground rounded-tr-none" 
+                : "bg-muted text-foreground rounded-tl-none"
+            }`}>
+              {m.text}
+            </div>
+          </div>
+        ))}
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="bg-muted px-4 py-2.5 rounded-2xl rounded-tl-none">
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            </div>
+          </div>
+        )}
+        <div ref={endRef} />
+      </div>
+
+      <div className="pt-4 border-t border-border flex flex-col gap-3">
+        {recording && (
+          <div className="flex items-center gap-3 px-3 py-2 bg-primary/5 border border-primary/20 rounded-xl animate-pulse">
+            <div className="h-2 w-2 rounded-full bg-primary animate-ping" />
+            <span className="text-xs font-medium text-primary">Listening: {interim || "..."}</span>
+          </div>
+        )}
+        
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <input
+              value={displayDraft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSend() }}
+              disabled={analyzing}
+              placeholder={recording ? "Listening..." : "Type your symptoms..."}
+              className="w-full bg-muted/50 border-none rounded-2xl py-3 px-4 pr-12 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all disabled:opacity-50"
+            />
+            <button 
+              onClick={recording ? stopRecording : startRecording}
+              disabled={starting || analyzing}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-colors ${
+                recording ? "text-destructive bg-destructive/10" : "text-muted-foreground hover:bg-muted"
+              }`}
+            >
+              {recording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+          </div>
+          
+          <button
+            onClick={handleSend}
+            disabled={!displayDraft.trim() || analyzing || isTyping}
+            className="h-11 w-11 flex items-center justify-center rounded-2xl bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all shadow-sm"
+          >
+            {analyzing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between px-1">
+          <p className="text-[10px] text-muted-foreground">
+            {messages.filter(m => m.role === "user").length}/6 questions answered
+          </p>
+          <button 
+            onClick={handleFinishEarly}
+            disabled={messages.filter(m => m.role === "user").length === 0 || analyzing}
+            className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1"
+          >
+            Analyze Now <ChevronRight className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---- Step 2 — AI Analysis & Doctor Match ---- */
+
+function AssignStep({
+  analysis,
+  isDistressed,
+  facilities,
+  onBack,
+  onAssign,
+}: {
+  analysis: TriageResult & { suggested_department?: string };
+  isDistressed: boolean;
+  facilities: Facility[];
+  onBack: () => void;
+  onAssign: (a: Assignment) => void;
+}) {
+  const prio = getPriority(analysis.severity);
+  const meta = priorityMeta[isDistressed ? "critical" : prio];
+  const PrioIcon = meta.icon;
+
+  const getBestDoctors = () => {
+    let matches: { doctor: Doctor; facility: Facility; matchScore: number }[] = [];
+    facilities.forEach((f) => {
+      f.departments.forEach((d) => {
+        if (d.name === analysis.suggested_department) {
+          d.doctors.forEach((doc) => {
+            if (doc.status === "available") {
+              matches.push({ doctor: doc, facility: f, matchScore: 100 });
+            }
+          });
+        }
+      });
+    });
+    if (matches.length === 0) {
+      facilities.forEach((f) => {
+        f.departments.forEach((d) => {
+          d.doctors.forEach((doc) => {
+            if (doc.status === "available") {
+              matches.push({ doctor: doc, facility: f, matchScore: 50 });
+            }
+          });
+        });
+      });
+    }
+    return matches.sort((a, b) => b.matchScore - a.matchScore).slice(0, 3);
+  };
+  const bestDoctors = getBestDoctors();
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className={`p-4 border-b border-border flex items-center gap-3 ${meta.color} bg-opacity-10`}>
+           <div className={`p-2 rounded-xl bg-background shadow-sm ${meta.color}`}>
+             <PrioIcon className="h-5 w-5" />
+           </div>
+           <div>
+             <h3 className="font-semibold text-foreground">AI Assessment Complete</h3>
+             <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <Clock className="h-3 w-3" /> {meta.label} Priority ({analysis.severity}/10)
+             </p>
+           </div>
+        </div>
+        <div className="p-5 space-y-4">
+           <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Symptoms</p>
+                 <p className="text-sm font-medium text-foreground">{analysis.main_symptom}</p>
+              </div>
+              <div className="space-y-1">
+                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Department</p>
+                 <p className="text-sm font-medium text-foreground">{analysis.suggested_department || "General"}</p>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+           <Stethoscope className="h-4 w-4 text-primary" /> Recommended Doctors
+        </h4>
+        <div className="space-y-3">
+          {bestDoctors.length > 0 ? (
+            bestDoctors.map((m) => (
+              <div
+                key={m.doctor.id}
+                onClick={() => onAssign({ doctorId: m.doctor.id, facilityId: m.facility.id, departmentName: analysis.suggested_department || "General", assignedAt: Date.now() })}
+                className="group flex items-center justify-between rounded-2xl border border-border bg-card p-4 hover:border-primary/50 hover:shadow-md transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-4">
+                   <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                      {m.doctor.name.charAt(0)}
+                   </div>
+                   <div>
+                      <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{m.doctor.name}</p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Building2 className="h-3 w-3" /> {m.facility.name}
+                      </p>
+                   </div>
+                </div>
+                <button className="text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                  Select
+                </button>
+              </div>
+            ))
+          ) : (
+             <div className="text-center p-6 border border-border rounded-2xl text-muted-foreground text-sm">
+                No available doctors right now. Please try again later.
+             </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex gap-3 pt-2">
+        <button
+          onClick={onBack}
+          className="flex-1 py-3 text-sm font-medium text-foreground border border-border rounded-xl hover:bg-muted transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---- Step 3 — Success ---- */
+
+function SuccessStep({
+  assignment,
+  severity,
+  onAgain,
+}: {
+  assignment: Assignment;
+  severity: number;
+  onAgain: () => void;
+}) {
+  const prio = getPriority(severity);
+  const meta = priorityMeta[prio];
+
+  return (
+    <div className="flex flex-col items-center justify-center py-8 text-center space-y-6">
+      <div className="relative">
+         <div className="absolute inset-0 rounded-full bg-success/20 animate-ping" />
+         <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-success text-primary-foreground shadow-xl">
+           <CheckCircle2 className="h-10 w-10" />
+         </div>
+      </div>
+      <div className="space-y-2">
+         <h3 className="text-2xl font-bold text-foreground tracking-tight">Request Sent!</h3>
+         <p className="text-muted-foreground max-w-xs mx-auto">
+           Your details have been securely sent to the selected facility.
+         </p>
+      </div>
+      
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-muted/30 p-5 space-y-4">
+         <div className="flex justify-between items-center pb-4 border-b border-border/50">
+            <span className="text-sm text-muted-foreground">Priority Level</span>
+            <span className={`text-sm font-bold ${meta.color} flex items-center gap-1`}>
+               {meta.label}
+            </span>
+         </div>
+         <div className="flex justify-between items-center">
+            <span className="text-sm text-muted-foreground">Next Step</span>
+            <span className="text-sm font-medium text-foreground">Wait for facility call</span>
+         </div>
+      </div>
+
+      <button
+        onClick={onAgain}
+        className="w-full max-w-sm py-3 text-sm font-semibold bg-primary text-primary-foreground rounded-xl shadow-md hover:opacity-90 transition-opacity"
+      >
+        Submit Another Record
+      </button>
+    </div>
+  );
+}
+
+/* ============================================================
+   Side Cards
+   ============================================================ */
+
+function QueueCard({
+  latest,
+  position,
+  totalWaiting,
+}: {
+  latest: PatientRecord | null;
+  position: number | null;
+  totalWaiting: number;
+}) {
+  if (!latest) {
+    return (
+      <div className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col items-center justify-center text-center h-full min-h-[250px] space-y-3">
+         <div className="p-3 bg-muted rounded-2xl">
+            <Activity className="h-6 w-6 text-muted-foreground" />
+         </div>
+         <div>
+            <h3 className="font-semibold text-foreground">No Active Requests</h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
+               Submit your symptoms using the wizard to see your status here.
+            </p>
+         </div>
+      </div>
+    );
+  }
+
+  const meta = priorityMeta[latest.priority];
+  const Icon = meta.icon;
+
+  return (
+    <div className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
+      <div className="space-y-1">
+        <h3 className="text-lg font-bold text-foreground tracking-tight">Current Status</h3>
+        <p className="text-sm text-muted-foreground flex items-center gap-1">
+           <Clock className="h-3.5 w-3.5" /> Updated just now
+        </p>
+      </div>
+
+      <div className="my-6 flex flex-col items-center justify-center space-y-2">
+        <div className="relative flex h-24 w-24 items-center justify-center rounded-full border-4 border-primary/20 bg-primary/5">
+           <span className="text-4xl font-black text-primary tracking-tighter">{position}</span>
+           <div className="absolute -bottom-2 -right-2 bg-card rounded-full p-1 border border-border shadow-sm">
+             <Icon className={`h-5 w-5 ${meta.color}`} />
+           </div>
+        </div>
+        <p className="text-sm font-medium text-foreground">Your position in queue</p>
+      </div>
+
+      <div className="space-y-3 rounded-2xl bg-muted/40 p-4 border border-border/50">
+        <div className="flex justify-between items-center text-sm">
+           <span className="text-muted-foreground">Severity Score</span>
+           <span className="font-semibold text-foreground">{latest.severity}/10</span>
+        </div>
+        <div className="flex justify-between items-center text-sm">
+           <span className="text-muted-foreground">Total Waiting</span>
+           <span className="font-medium text-foreground">{totalWaiting} patients</span>
+        </div>
+        <div className="flex justify-between items-center text-sm">
+           <span className="text-muted-foreground">Department</span>
+           <span className="font-medium text-foreground">{latest.suggested_department || "General"}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SubmissionsCard({ records }: { records: PatientRecord[] }) {
+  return (
+    <div className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col h-full max-h-[500px]">
+      <div className="flex items-center justify-between mb-4">
+         <h3 className="text-lg font-bold text-foreground tracking-tight">Recent Submissions</h3>
+         <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full">
+            {records.length}
+         </span>
+      </div>
+      
+      {records.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-2">
+           <FileText className="h-8 w-8 text-muted-foreground/50" />
+           <p className="text-sm text-muted-foreground">No previous records found.</p>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
+          {records.map((r) => {
+            const meta = priorityMeta[r.priority];
+            const date = new Date(r.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            return (
+              <div key={r.id} className="group p-3 rounded-2xl border border-border bg-background hover:border-primary/30 transition-colors flex flex-col gap-2 cursor-default">
+                <div className="flex justify-between items-start">
+                   <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full bg-current ${meta.color}`} />
+                      <span className="text-xs font-semibold text-foreground">{r.main_symptom || "Checkup"}</span>
+                   </div>
+                   <span className="text-[10px] text-muted-foreground font-medium bg-muted px-2 py-0.5 rounded-full">{date}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                   <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {r.location || "N/A"}</span>
+                   <span className={`capitalize font-medium ${r.status === 'resolved' ? 'text-success' : 'text-primary'}`}>
+                     {r.status}
+                   </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
